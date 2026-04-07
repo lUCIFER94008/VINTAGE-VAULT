@@ -25,16 +25,31 @@ export default function RegisterPage() {
     return true;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
     
     setLoading(true);
-    // Simulate registration
-    setTimeout(() => {
+    try {
+      const res = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (data.error) {
+        alert("❌ " + data.error);
+      } else {
+        alert("✅ Registered successfully! Please login.");
+        window.location.href = "/login";
+      }
+    } catch (error) {
+      alert("❌ Something went wrong. Try again.");
+    } finally {
       setLoading(false);
-      alert('Registration functionality is not implemented in this demo.');
-    }, 1500);
+    }
   };
 
   return (

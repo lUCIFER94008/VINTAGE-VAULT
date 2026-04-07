@@ -13,9 +13,9 @@ export default function AdminPage() {
     name: '',
     price: '',
     description: '',
-    category: 'Oversized Tees'
+    category: 'Oversized Tees',
+    file: null // Added file field
   });
-  const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
@@ -23,33 +23,29 @@ export default function AdminPage() {
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
     if (!user || user.role !== 'admin') {
-      router.push('/login');
+      window.location.href = "/login";
     } else {
       setAdminUser(user);
       setCheckingAuth(false);
     }
-  }, [router]);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('user');
-    router.push('/');
+    window.location.href = "/";
   };
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
-      setFile(selectedFile);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreview(reader.result);
-      };
-      reader.readAsDataURL(selectedFile);
+      setFormData({ ...formData, file: selectedFile });
+      setPreview(URL.createObjectURL(selectedFile));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!file) return alert('Please select an image');
+    if (!formData.file) return alert('Please select an image');
 
     setLoading(true);
     const data = new FormData();
@@ -57,7 +53,7 @@ export default function AdminPage() {
     data.append('price', formData.price);
     data.append('description', formData.description);
     data.append('category', formData.category);
-    data.append('image', file);
+    data.append('file', formData.file); // Field named 'file'
 
     try {
       const res = await fetch('/api/products', {
@@ -69,8 +65,7 @@ export default function AdminPage() {
       if (result.success) {
         setToast({ message: 'Product Added Successfully!', type: 'success' });
         // Reset form
-        setFormData({ name: '', price: '', description: '', category: 'Oversized Tees' });
-        setFile(null);
+        setFormData({ name: '', price: '', description: '', category: 'Oversized Tees', file: null });
         setPreview(null);
       } else {
         setToast({ message: result.error || 'Failed to add product', type: 'error' });

@@ -12,21 +12,36 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    // Simulate login logic
-    setTimeout(() => {
-      if (email === 'admin@vault.com' && password === 'admin123') {
-        localStorage.setItem('user', JSON.stringify({ role: 'admin', email }));
-        router.push('/admin');
+    try {
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (data.error) {
+        setError("❌ Invalid login: " + data.error);
       } else {
-        setError('Invalid email or password. Please try again.');
-        setLoading(false);
+        localStorage.setItem("user", JSON.stringify(data.user));
+
+        if (data.user.role === "admin") {
+          window.location.href = "/admin";
+        } else {
+          window.location.href = "/";
+        }
       }
-    }, 1000);
+    } catch (error) {
+      setError("❌ Something went wrong. Try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
