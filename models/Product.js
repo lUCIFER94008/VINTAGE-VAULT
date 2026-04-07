@@ -23,6 +23,10 @@ const ProductSchema = new mongoose.Schema({
       enum: ['5 Sleeve Jersey', 'Shorts', 'Track Pant', 'Printed Socks', 'Headwear', 'Baggy'],
       default: '5 Sleeve Jersey',
     },
+    available: {
+      type: Boolean,
+      default: true,
+    },
 }, {
   timestamps: true,
 });
