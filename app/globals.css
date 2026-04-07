@@ -1,0 +1,37 @@
+@import "tailwindcss";
+@config "../tailwind.config.js";
+
+:root {
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 0, 0, 0;
+  --background-end-rgb: 0, 0, 0;
+  --gold: #d4af37;
+}
+
+body {
+  @apply bg-black text-white selection:bg-gold selection:text-black;
+  min-height: 100vh;
+}
+
+@layer components {
+  .btn-gold {
+    @apply bg-gold text-black px-6 py-2 rounded-full font-bold hover:bg-white transition-all duration-300;
+  }
+  
+  .glass {
+    @apply bg-black/50 backdrop-blur-md border border-white/10;
+  }
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px gold, 0 0 20px gold;
+  }
+  to {
+    text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px gold, 0 0 40px gold;
+  }
+}
