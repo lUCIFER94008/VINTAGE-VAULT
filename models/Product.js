@@ -18,11 +18,11 @@ const ProductSchema = new mongoose.Schema({
     type: String, // Cloudinary URL
     required: [true, 'Please provide an image URL.'],
   },
-  category: {
-    type: String,
-    enum: ['Oversized Tees', 'Jerseys', 'Vintage Wear'],
-    default: 'Oversized Tees',
-  },
+    category: {
+      type: String,
+      enum: ['5 Sleeve Jersey', 'Shorts', 'Track Pant', 'Printed Socks', 'Headwear', 'Baggy'],
+      default: '5 Sleeve Jersey',
+    },
 }, {
   timestamps: true,
 });

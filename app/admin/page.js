@@ -13,7 +13,7 @@ export default function AdminPage() {
     name: '',
     price: '',
     description: '',
-    category: 'Oversized Tees',
+    category: '5 Sleeve Jersey',
     file: null // Added file field
   });
   const [preview, setPreview] = useState(null);
@@ -65,7 +65,7 @@ export default function AdminPage() {
       if (result.success) {
         setToast({ message: 'Product Added Successfully!', type: 'success' });
         // Reset form
-        setFormData({ name: '', price: '', description: '', category: 'Oversized Tees', file: null });
+        setFormData({ name: '', price: '', description: '', category: '5 Sleeve Jersey', file: null });
         setPreview(null);
       } else {
         setToast({ message: result.error || 'Failed to add product', type: 'error' });
@@ -184,9 +184,12 @@ export default function AdminPage() {
                     onChange={(e) => setFormData({...formData, category: e.target.value})}
                     className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-gold outline-none transition appearance-none"
                   >
-                    <option>Oversized Tees</option>
-                    <option>Jerseys</option>
-                    <option>Vintage Wear</option>
+                    <option>5 Sleeve Jersey</option>
+                    <option>Shorts</option>
+                    <option>Track Pant</option>
+                    <option>Printed Socks</option>
+                    <option>Headwear</option>
+                    <option>Baggy</option>
                   </select>
                 </div>
               </div>

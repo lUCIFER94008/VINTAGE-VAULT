@@ -4,9 +4,12 @@ import { ChevronRight, ArrowRight, Truck, RefreshCcw, Smartphone } from 'lucide-
 import { motion } from 'framer-motion';
 
 const CATEGORIES = [
-  { name: 'Oversized Tees', image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&q=80&w=800' },
-  { name: 'Jerseys', image: 'https://images.unsplash.com/photo-1523381235312-359392632839?auto=format&fit=crop&q=80&w=800' },
-  { name: 'Vintage Wear', image: 'https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?auto=format&fit=crop&q=80&w=800' },
+  { name: '5 Sleeve Jersey', slug: 'jersey', image: 'https://images.unsplash.com/photo-1580087442627-6260ef222122?auto=format&fit=crop&q=80&w=800' },
+  { name: 'Shorts', slug: 'shorts', image: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&q=80&w=800' },
+  { name: 'Track Pant', slug: 'trackpant', image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=800' },
+  { name: 'Printed Socks', slug: 'socks', image: 'https://images.unsplash.com/photo-1582966772640-3104347878e7?auto=format&fit=crop&q=80&w=800' },
+  { name: 'Headwear', slug: 'headwear', image: 'https://images.unsplash.com/photo-1521369909029-2afed882baee?auto=format&fit=crop&q=80&w=800' },
+  { name: 'Baggy', slug: 'baggy', image: 'https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?auto=format&fit=crop&q=80&w=800' },
 ];
 
 export default function Home() {
@@ -81,25 +84,25 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {CATEGORIES.map((cat, i) => (
             <motion.div 
               key={cat.name}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
               transition={{ delay: i * 0.1 }}
               viewport={{ once: true }}
-              className="relative aspect-[4/5] overflow-hidden rounded-2xl group cursor-pointer"
+              className="relative aspect-[4/5] overflow-hidden rounded-2xl group cursor-pointer border border-white/5"
             >
               <img 
                 src={cat.image} 
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
                 alt={cat.name}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-              <div className="absolute bottom-8 left-8">
-                <h4 className="text-2xl font-bold mb-2">{cat.name}</h4>
-                <Link href="/products" className="text-gold text-xs font-bold uppercase tracking-widest flex items-center group-hover:gap-2 transition-all">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+              <div className="absolute bottom-4 left-4 md:bottom-8 md:left-8">
+                <h4 className="text-lg md:text-2xl font-bold mb-1 md:mb-2 leading-tight">{cat.name}</h4>
+                <Link href={`/products?category=${cat.slug}`} className="text-gold text-[10px] md:text-xs font-bold uppercase tracking-widest flex items-center group-hover:gap-2 transition-all">
                   Explore <ArrowRight size={14} className="ml-2" />
                 </Link>
               </div>
