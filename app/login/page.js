@@ -45,18 +45,18 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen pt-32 pb-24 px-6 flex items-center justify-center bg-black overflow-hidden relative">
+    <div className="min-h-screen pt-24 pb-16 px-6 flex items-center justify-center bg-black overflow-hidden relative">
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gold/5 blur-[120px] rounded-full animate-pulse" />
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-900/5 blur-[120px] rounded-full animate-pulse-slow" />
 
       <motion.div 
-        initial={{ opacity: 0, scale: 0.95 }}
+        initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="max-w-md w-full bg-[#0a0a0a] rounded-3xl border border-white/5 p-10 md:p-12 shadow-2xl relative z-10"
+        className="max-w-md w-full bg-[#0a0a0a] rounded-2xl border border-white/5 p-6 md:p-8 shadow-2xl relative z-10"
       >
-        <div className="text-center mb-10">
-          <h1 className="text-3xl font-black tracking-tighter mb-2 uppercase italic text-white">ACCESS THE <span className="text-gold">VAULT</span></h1>
-          <p className="text-xs uppercase tracking-[0.2em] text-gray-500 font-bold">Sign in to your account</p>
+        <div className="text-center mb-8">
+          <h1 className="text-2xl md:text-3xl font-black tracking-tighter mb-1 uppercase italic text-white">ACCESS THE <span className="text-gold">VAULT</span></h1>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-gray-500 font-bold">Sign in to your account</p>
         </div>
 
         <AnimatePresence>
@@ -65,64 +65,64 @@ export default function LoginPage() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="bg-red-500/10 border border-red-500/50 text-red-100 p-4 rounded-2xl flex items-center mb-6 text-xs"
+              className="bg-red-500/10 border border-red-500/50 text-red-100 p-3 rounded-xl flex items-center mb-5 text-[10px]"
             >
-              <AlertCircle className="w-4 h-4 mr-2" />
+              <AlertCircle className="w-3 h-3 mr-2 text-red-500" />
               {error}
             </motion.div>
           )}
         </AnimatePresence>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="space-y-3">
             <div>
-              <label className="block text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-2 ml-1">Email Address</label>
+              <label className="block text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-1.5 ml-1">Email Address</label>
               <div className="relative">
-                <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600" />
+                <Mail size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600" />
                 <input 
                   type="email" 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   placeholder="name@example.com"
-                  className="w-full bg-black border border-white/10 rounded-2xl pl-12 pr-4 py-4 text-sm focus:border-gold outline-none transition text-white"
+                  className="w-full bg-black border border-white/10 rounded-xl pl-12 pr-4 py-3 text-sm focus:border-gold outline-none transition text-white placeholder:text-gray-700"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-2 ml-1">Password</label>
+              <label className="block text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-1.5 ml-1">Password</label>
               <div className="relative">
-                <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600" />
+                <Lock size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600" />
                 <input 
                   type="password" 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   placeholder="••••••••"
-                  className="w-full bg-black border border-white/10 rounded-2xl pl-12 pr-4 py-4 text-sm focus:border-gold outline-none transition text-white"
+                  className="w-full bg-black border border-white/10 rounded-xl pl-12 pr-4 py-3 text-sm focus:border-gold outline-none transition text-white placeholder:text-gray-700"
                 />
               </div>
             </div>
           </div>
 
           <div className="text-right">
-            <Link href="#" className="text-[10px] uppercase tracking-widest text-gray-500 hover:text-gold transition font-bold">Forgot Password?</Link>
+            <Link href="#" className="text-[9px] uppercase tracking-widest text-gray-500 hover:text-gold transition font-bold">Forgot Password?</Link>
           </div>
 
           <button 
             type="submit"
             disabled={loading}
-            className="w-full bg-white text-black font-black uppercase tracking-[0.2em] py-5 rounded-2xl flex items-center justify-center space-x-3 text-sm hover:bg-gold disabled:opacity-50 transition-all font-sans shadow-xl mt-4"
+            className="w-full bg-white text-black font-black uppercase tracking-[0.2em] py-3.5 rounded-xl flex items-center justify-center space-x-2 text-xs hover:bg-gold disabled:opacity-50 transition-all font-sans shadow-xl mt-2"
           >
-            {loading ? <Loader2 size={20} className="animate-spin" /> : <><span>Sign In</span> <ChevronRight size={18} /></>}
+            {loading ? <Loader2 size={18} className="animate-spin" /> : <><span>Sign In</span> <ChevronRight size={16} /></>}
           </button>
         </form>
 
-        <div className="mt-10 pt-8 border-t border-white/5 text-center">
-            <p className="text-xs text-gray-500 mb-4 tracking-tight">New to the vault?</p>
+        <div className="mt-8 pt-6 border-t border-white/5 text-center">
+            <p className="text-[10px] text-gray-500 mb-3 tracking-tight">New to the vault?</p>
             <Link href="/register">
-              <button className="text-gold text-[10px] uppercase tracking-[0.2em] font-black border border-gold/30 px-6 py-2 rounded-full hover:bg-gold hover:text-black transition-all">
+              <button className="text-gold text-[9px] uppercase tracking-[0.2em] font-black border border-gold/30 px-5 py-1.5 rounded-full hover:bg-gold hover:text-black transition-all">
                 Create Account
               </button>
             </Link>
