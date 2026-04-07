@@ -6,10 +6,17 @@ export async function POST(req) {
   try {
     await connectDB();
 
-    const { name, email, phone, password } = await req.json();
+    const { name, email, phone, password, role, adminSecret } = await req.json();
 
     if (!name || !email || !phone || !password) {
       return NextResponse.json({ error: "All fields are required" }, { status: 400 });
+    }
+
+    // Role-based validation
+    if (role === 'admin') {
+      if (!adminSecret || adminSecret !== process.env.ADMIN_SECRET) {
+        return NextResponse.json({ error: "Invalid Admin Secret Key" }, { status: 401 });
+      }
     }
 
     // Check if user already exists
@@ -22,7 +29,8 @@ export async function POST(req) {
       name,
       email,
       phone,
-      password, // Note: In production, hash this with bcryptjs
+      password,
+      role: role || 'user',
     });
 
     return NextResponse.json({ success: true, user: { name: user.name, email: user.email } }, { status: 201 });
