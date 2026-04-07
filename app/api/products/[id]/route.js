@@ -4,40 +4,44 @@ import Product from "@/models/Product";
 
 // DELETE a product
 export async function DELETE(req, { params }) {
+  await connectDB();
   try {
-    await connectDB();
-    const id = params.id;
+    const { id } = await params;
     await Product.findByIdAndDelete(id);
-    return NextResponse.json({ success: true, message: "Product deleted" });
+    return NextResponse.json({ success: true });
   } catch (error) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Delete failed" }, { status: 500 });
   }
 }
 
-// PUT (Full Update)
+// UPDATE (Full)
 export async function PUT(req, { params }) {
+  await connectDB();
   try {
-    await connectDB();
-    const id = params.id;
+    const { id } = await params;
     const data = await req.json();
-    
-    const updatedProduct = await Product.findByIdAndUpdate(id, data, { new: true });
-    return NextResponse.json({ success: true, data: updatedProduct });
+    const updated = await Product.findByIdAndUpdate(id, data, { new: true });
+    return NextResponse.json({ success: true, data: updated });
   } catch (error) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Update failed" }, { status: 500 });
   }
 }
 
-// PATCH (Partial Update - e.g., Availability Toggle)
+// UPDATE AVAILABILITY (Toggle)
 export async function PATCH(req, { params }) {
+  await connectDB();
   try {
-    await connectDB();
-    const id = params.id;
+    const { id } = await params;
     const { available } = await req.json();
-    
-    const updatedProduct = await Product.findByIdAndUpdate(id, { available }, { new: true });
-    return NextResponse.json({ success: true, data: updatedProduct });
+
+    const updated = await Product.findByIdAndUpdate(
+      id,
+      { available },
+      { new: true }
+    );
+
+    return NextResponse.json(updated);
   } catch (error) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Update failed" }, { status: 500 });
   }
 }

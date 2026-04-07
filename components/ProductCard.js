@@ -15,10 +15,14 @@ export default function ProductCard({ product }) {
           src={product.image}
           alt={product.name}
           fill
-          className="object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
+          className={`object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out ${product.available === false ? 'grayscale-[0.5] opacity-60' : ''}`}
         />
-        <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold text-gold border border-gold/20 tracking-wider uppercase">
-          New Arrival
+        <div className={`absolute top-4 right-4 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold border tracking-wider uppercase ${
+          product.available !== false 
+            ? 'bg-black/60 text-gold border-gold/20' 
+            : 'bg-red-500/20 text-red-500 border-red-500/30'
+        }`}>
+          {product.available !== false ? 'New Arrival' : 'Out of Stock'}
         </div>
       </div>
 

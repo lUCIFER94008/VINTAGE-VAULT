@@ -76,10 +76,12 @@ export default function ProductDetail() {
           <img 
             src={product.image} 
             alt={product.name}
-            className="w-full h-full object-cover"
+            className={`w-full h-full object-cover ${product.available === false ? 'grayscale-[0.5] opacity-60' : ''}`}
           />
-          <div className="absolute top-6 left-6 bg-black/60 backdrop-blur-md px-4 py-2 rounded-full text-xs font-bold text-gold border border-gold/20 tracking-widest uppercase">
-            Surplus Curated
+          <div className={`absolute top-6 left-6 backdrop-blur-md px-4 py-2 rounded-full text-xs font-bold border tracking-widest uppercase ${
+            product.available !== false ? 'bg-black/60 text-gold border-gold/20' : 'bg-red-500/20 text-red-500 border-red-500/30'
+          }`}>
+            {product.available !== false ? 'Surplus Curated' : 'Out of Stock'}
           </div>
         </motion.div>
 
@@ -109,10 +111,11 @@ export default function ProductDetail() {
                 <button
                   key={size}
                   onClick={() => setSelectedSize(size)}
+                  disabled={product.available === false}
                   className={`w-12 h-12 flex items-center justify-center rounded-lg border transition-all duration-300 font-bold ${
                     selectedSize === size 
                       ? 'border-gold bg-gold text-black shadow-[0_0_15px_rgba(212,175,55,0.3)]' 
-                      : 'border-white/10 text-gray-500 hover:border-white/30'
+                      : 'border-white/10 text-gray-500 hover:border-white/30 disabled:opacity-30 disabled:cursor-not-allowed'
                   }`}
                 >
                   {size}
@@ -123,16 +126,25 @@ export default function ProductDetail() {
 
           {/* Actions */}
           <div className="flex flex-col space-y-4 mb-12">
-            <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
-              <motion.button 
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="w-full bg-[#25D366] text-black font-black uppercase tracking-[0.2em] py-5 rounded-2xl flex items-center justify-center space-x-3 text-sm hover:brightness-110 transition-all font-sans shadow-xl"
+            {product.available !== false ? (
+              <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+                <motion.button 
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full bg-[#25D366] text-black font-black uppercase tracking-[0.2em] py-5 rounded-2xl flex items-center justify-center space-x-3 text-sm hover:brightness-110 transition-all font-sans shadow-xl"
+                >
+                  <span>Order via WhatsApp</span>
+                  <ShoppingBag size={20} />
+                </motion.button>
+              </a>
+            ) : (
+              <button 
+                disabled
+                className="w-full bg-red-500/10 text-red-500 border border-red-500/20 font-black uppercase tracking-[0.2em] py-5 rounded-2xl flex items-center justify-center space-x-3 text-sm cursor-not-allowed"
               >
-                <span>Order via WhatsApp</span>
-                <ShoppingBag size={20} />
-              </motion.button>
-            </a>
+                <span>Currently Unavailable</span>
+              </button>
+            )}
             <p className="text-[10px] text-center text-gray-500 uppercase tracking-widest font-semibold flex items-center justify-center space-x-2">
               <span className="w-1 h-1 bg-gold rounded-full mr-2" />
               <span>Available for COD All India Shipping</span>

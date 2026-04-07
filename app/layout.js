@@ -8,6 +8,9 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 export const metadata = {
   title: 'VINTAGE.VAULT | Timeless Style. Sustainable Fashion.',
   description: 'Premium Surplus & Thrifted Fashion store based in Perumbavoor, Kerala. Shipping all over India.',
+  icons: {
+    icon: '/favicon.png',
+  },
 };
 
 export default function RootLayout({ children }) {
