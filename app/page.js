@@ -4,12 +4,12 @@ import { ChevronRight, ArrowRight, Truck, RefreshCcw, Smartphone } from 'lucide-
 import { motion } from 'framer-motion';
 
 const CATEGORIES = [
-  { name: '5 Sleeve Jersey', slug: 'jersey', image: 'https://images.unsplash.com/photo-1580087442627-6260ef222122?auto=format&fit=crop&q=80&w=800' },
+  { name: '5 Sleeve Jersey', slug: 'jersey', image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=800' },
   { name: 'Shorts', slug: 'shorts', image: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&q=80&w=800' },
   { name: 'Track Pant', slug: 'trackpant', image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=800' },
-  { name: 'Printed Socks', slug: 'socks', image: 'https://images.unsplash.com/photo-1582966772640-3104347878e7?auto=format&fit=crop&q=80&w=800' },
+  { name: 'Printed Socks', slug: 'socks', image: 'https://images.unsplash.com/photo-1586350977771-b3b0abd50c82?auto=format&fit=crop&q=80&w=800' },
   { name: 'Headwear', slug: 'headwear', image: 'https://images.unsplash.com/photo-1521369909029-2afed882baee?auto=format&fit=crop&q=80&w=800' },
-  { name: 'Baggy', slug: 'baggy', image: 'https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?auto=format&fit=crop&q=80&w=800' },
+  { name: 'Baggy', slug: 'baggy', image: 'https://weavewardrobe.com/cdn/shop/files/2_119b4419-b42c-4457-a628-e13c2a2da54d_900x.jpg?v=1740581904' },
 ];
 
 export default function Home() {
