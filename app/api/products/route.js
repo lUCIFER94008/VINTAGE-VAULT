@@ -10,16 +10,27 @@ export async function GET(req) {
     await connectDB();
     const { searchParams } = new URL(req.url);
     const category = searchParams.get('category');
+    const isAdmin = searchParams.get('admin') === 'true';
     
-    // DEBUG LOG FOR VERCEL
+    // DEBUG LOGS
     console.log("CATEGORY:", category);
+    console.log("IS_ADMIN:", isAdmin);
     
     let query = {};
     if (category && category !== "undefined" && category !== "null") {
       query.category = category;
     }
 
+    // FILTER BY AVAILABILITY (Users only)
+    if (!isAdmin) {
+      query.available = true;
+    }
+
+    console.log("FINAL QUERY:", query);
+
     const products = await Product.find(query).sort({ createdAt: -1 });
+    console.log("TOTAL PRODUCTS FOUND:", products.length);
+    
     return NextResponse.json({ success: true, data: products });
   } catch (error) {
     console.error("Fetch Error:", error);
