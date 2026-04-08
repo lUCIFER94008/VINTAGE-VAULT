@@ -12,6 +12,9 @@ export async function GET(req) {
     const category = searchParams.get('category');
     const isAdmin = searchParams.get('admin') === 'true';
     
+    // ENV CHECK
+    console.log("ENV CHECK:", process.env.MONGODB_URI ? "OK" : "MISSING");
+    
     // DEBUG LOGS
     console.log("RAW_CATEGORY:", category);
     console.log("DECODED_CATEGORY:", category ? decodeURIComponent(category) : null);
