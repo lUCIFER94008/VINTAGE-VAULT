@@ -14,18 +14,13 @@ function ProductsContent() {
   useEffect(() => {
     async function fetchProducts() {
       try {
-        const res = await fetch('/api/products');
+        const url = categoryFilter 
+          ? `/api/products?category=${encodeURIComponent(categoryFilter)}`
+          : '/api/products';
+        const res = await fetch(url);
         const data = await res.json();
         if (data.success) {
-          let filteredProducts = data.data;
-          if (categoryFilter) {
-            // Mapping friendly names to slug-like categories if needed, but here I'll check both
-            filteredProducts = filteredProducts.filter(p => 
-              p.category?.toLowerCase() === categoryFilter.toLowerCase() ||
-              p.category?.toLowerCase().replace(/\s+/g, '') === categoryFilter.toLowerCase()
-            );
-          }
-          setProducts(filteredProducts);
+          setProducts(data.data);
         }
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -48,11 +43,21 @@ function ProductsContent() {
   return (
     <div className="pt-32 pb-24 px-6 max-w-7xl mx-auto">
       <div className="mb-12">
-        <h1 className="text-4xl font-black tracking-tighter mb-4">
-          {categoryFilter ? `${categoryFilter.toUpperCase()} COLLECTION` : 'THE ENTIRE VAULT'}
+        <h1 className="text-4xl font-black tracking-tighter mb-4 flex items-center gap-4">
+          {categoryFilter ? (
+            <>
+              <span className="text-gold">{categoryFilter.toUpperCase()}</span>
+              <span className="text-white">COLLECTION</span>
+            </>
+          ) : 'THE ENTIRE VAULT'}
         </h1>
+        {categoryFilter && (
+          <Link href="/products" className="text-gold text-[10px] font-bold uppercase tracking-widest hover:text-white transition-colors flex items-center mb-4">
+            <span>View All Products</span>
+          </Link>
+        )}
         <p className="text-gray-400 uppercase tracking-widest text-xs">
-          {categoryFilter ? `Exploring ${categoryFilter} fashion` : 'Surplus / Thrifted Fashion Collection'}
+          {categoryFilter ? `Exploring ${categoryFilter} curated fashion` : 'Surplus / Thrifted Fashion Collection'}
         </p>
       </div>
 

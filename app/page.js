@@ -4,12 +4,12 @@ import { ChevronRight, ArrowRight, Truck, RefreshCcw, Smartphone } from 'lucide-
 import { motion } from 'framer-motion';
 
 const CATEGORIES = [
-  { name: '5 Sleeve Jersey', slug: 'jersey', image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=800' },
-  { name: 'Shorts', slug: 'shorts', image: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&q=80&w=800' },
-  { name: 'Track Pant', slug: 'trackpant', image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=800' },
-  { name: 'Printed Socks', slug: 'socks', image: 'https://images.unsplash.com/photo-1586350977771-b3b0abd50c82?auto=format&fit=crop&q=80&w=800' },
-  { name: 'Headwear', slug: 'headwear', image: 'https://images.unsplash.com/photo-1521369909029-2afed882baee?auto=format&fit=crop&q=80&w=800' },
-  { name: 'Baggy', slug: 'baggy', image: 'https://weavewardrobe.com/cdn/shop/files/2_119b4419-b42c-4457-a628-e13c2a2da54d_900x.jpg?v=1740581904' },
+  { name: '5 Sleeve Jersey', slug: '5 Sleeve Jersey', image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=800' },
+  { name: 'Shorts', slug: 'Shorts', image: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&q=80&w=800' },
+  { name: 'Track Pant', slug: 'Track Pant', image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=800' },
+  { name: 'Printed Socks', slug: 'Printed Socks', image: 'https://images.unsplash.com/photo-1586350977771-b3b0abd50c82?auto=format&fit=crop&q=80&w=800' },
+  { name: 'Headwear', slug: 'Headwear', image: 'https://images.unsplash.com/photo-1521369909029-2afed882baee?auto=format&fit=crop&q=80&w=800' },
+  { name: 'Baggy', slug: 'Baggy', image: 'https://weavewardrobe.com/cdn/shop/files/2_119b4419-b42c-4457-a628-e13c2a2da54d_900x.jpg?v=1740581904' },
 ];
 
 export default function Home() {
@@ -109,39 +109,44 @@ export default function Home() {
  
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {CATEGORIES.map((cat, i) => (
-              <motion.div 
-                key={cat.name}
-                initial={{ opacity: 0, y: 15 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05 }}
-                viewport={{ once: true }}
-                className="group relative h-[200px] sm:h-[240px] md:h-[260px] overflow-hidden rounded-xl cursor-pointer border border-white/5 transition-all duration-300"
+              <Link 
+                key={cat.name} 
+                href={`/products?category=${encodeURIComponent(cat.name)}`}
+                className="contents"
               >
-                <img 
-                  src={cat.image} 
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 brightness-75" 
-                  alt={cat.name}
-                  loading="lazy"
-                />
-                
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-100" />
-                
-                <div className="absolute bottom-3 left-4 lg:bottom-4 lg:left-5 right-4 transition-all duration-300">
-                  <span className="text-gold text-[9px] font-bold uppercase tracking-[2px] block mb-1 opacity-70">
-                    Discover Collection
-                  </span>
-                  <h4 className="text-base sm:text-lg lg:text-xl font-bold text-white tracking-tight uppercase leading-tight">
-                    {cat.name}
-                  </h4>
+                <motion.div 
+                  initial={{ opacity: 0, y: 15 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                  viewport={{ once: true }}
+                  className="group relative h-[200px] sm:h-[240px] md:h-[260px] overflow-hidden rounded-xl cursor-pointer border border-white/5 transition-all duration-300"
+                >
+                  <img 
+                    src={cat.image} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 brightness-75" 
+                    alt={cat.name}
+                    loading="lazy"
+                  />
                   
-                  <div className="flex items-center mt-2 text-gold opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
-                     <span className="text-[9px] font-bold uppercase tracking-widest mr-2">Shop Now</span>
-                     <ArrowRight size={12} />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-100" />
+                  
+                  <div className="absolute bottom-3 left-4 lg:bottom-4 lg:left-5 right-4 transition-all duration-300">
+                    <span className="text-gold text-[9px] font-bold uppercase tracking-[2px] block mb-1 opacity-70">
+                      Discover Collection
+                    </span>
+                    <h4 className="text-base sm:text-lg lg:text-xl font-bold text-white tracking-tight uppercase leading-tight">
+                      {cat.name}
+                    </h4>
+                    
+                    <div className="flex items-center mt-2 text-gold opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
+                       <span className="text-[9px] font-bold uppercase tracking-widest mr-2">Shop Now</span>
+                       <ArrowRight size={12} />
+                    </div>
                   </div>
-                </div>
-                
-                <div className="absolute inset-0 ring-1 ring-inset ring-white/5 group-hover:ring-gold/30 transition-all duration-300 rounded-xl" />
-              </motion.div>
+                  
+                  <div className="absolute inset-0 ring-1 ring-inset ring-white/5 group-hover:ring-gold/30 transition-all duration-300 rounded-xl" />
+                </motion.div>
+              </Link>
             ))}
           </div>
         </div>

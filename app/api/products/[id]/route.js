@@ -19,8 +19,8 @@ export async function PUT(req, { params }) {
   await connectDB();
   try {
     const { id } = await params;
-    const data = await req.json();
-    const updated = await Product.findByIdAndUpdate(id, data, { new: true });
+    const body = await req.json();
+    const updated = await Product.findByIdAndUpdate(id, body, { new: true });
     return NextResponse.json({ success: true, data: updated });
   } catch (error) {
     return NextResponse.json({ error: "Update failed" }, { status: 500 });
@@ -32,15 +32,15 @@ export async function PATCH(req, { params }) {
   await connectDB();
   try {
     const { id } = await params;
-    const { available } = await req.json();
+    const body = await req.json();
 
     const updated = await Product.findByIdAndUpdate(
       id,
-      { available },
+      { available: body.available },
       { new: true }
     );
 
-    return NextResponse.json(updated);
+    return NextResponse.json({ success: true, data: updated });
   } catch (error) {
     return NextResponse.json({ error: "Update failed" }, { status: 500 });
   }

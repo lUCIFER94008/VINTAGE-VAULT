@@ -10,6 +10,9 @@ export default function AdminPage() {
   const [adminUser, setAdminUser] = useState(null);
   const [products, setProducts] = useState([]);
   const [editingId, setEditingId] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [actionType, setActionType] = useState(""); // "available" or "oos"
   
   const [formData, setFormData] = useState({
     name: '',
@@ -112,21 +115,33 @@ export default function AdminPage() {
     }
   };
 
-  const handleToggleAvailability = async (id, currentStatus) => {
+  const handleActionClick = (product, type) => {
+    setSelectedProduct(product);
+    setActionType(type);
+    setShowModal(true);
+  };
+
+  const handleConfirm = async () => {
+    if (!selectedProduct) return;
+    setLoading(true);
+
     try {
-      const res = await fetch(`/api/products/${id}`, {
+      const status = actionType === "available";
+      const res = await fetch(`/api/products/${selectedProduct._id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ available: !currentStatus }),
+        body: JSON.stringify({ available: status }),
       });
       const result = await res.json();
-      if (result.success) {
-        setToast({ message: `Status: ${!currentStatus ? 'Available' : 'Out of Stock'}`, type: 'success' });
+      if (result.success || res.ok) {
+        setToast({ message: `Status: ${status ? 'Available' : 'Out of Stock'}`, type: 'success' });
         fetchRecentProducts();
       }
     } catch (error) {
       setToast({ message: 'Error updating availability', type: 'error' });
     } finally {
+      setShowModal(false);
+      setLoading(false);
       setTimeout(() => setToast(null), 2000);
     }
   };
@@ -493,7 +508,7 @@ export default function AdminPage() {
                       <span>Edit</span>
                     </button>
                     <button 
-                      onClick={() => handleToggleAvailability(product._id, product.available !== false)}
+                      onClick={() => handleActionClick(product, product.available !== false ? "oos" : "available")}
                       className={`flex-1 flex items-center justify-center space-x-2 ${product.available !== false ? 'bg-green-500/5 border-green-500/20 text-green-500 hover:bg-green-500 hover:text-white' : 'bg-red-500/5 border-red-500/20 text-red-500 hover:bg-red-500 hover:text-white'} py-3 rounded-xl transition-all text-[10px] font-bold uppercase tracking-widest border`}
                     >
                       {product.available !== false ? <Check size={14} /> : <AlertTriangle size={14} />}
@@ -519,6 +534,58 @@ export default function AdminPage() {
           </div>
         )}
       </div>
+
+      {/* Confirmation Modal */}
+      <AnimatePresence>
+        {showModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[110] px-6"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-[#0a0a0a] border border-white/10 p-8 md:p-10 rounded-[2.5rem] w-full max-w-md text-center shadow-3xl"
+            >
+              <div className={`w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-6 ${actionType === 'available' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
+                {actionType === 'available' ? <CheckCircle size={32} /> : <AlertTriangle size={32} />}
+              </div>
+              
+              <h2 className="text-xl md:text-2xl font-black tracking-tight mb-2 uppercase italic text-white leading-tight">
+                {actionType === "available"
+                  ? "Mark as Available?"
+                  : "Mark as Out of Stock?"}
+              </h2>
+
+              <p className="text-gray-500 mb-8 uppercase tracking-[0.2em] text-[10px] font-bold">
+                {selectedProduct?.name}
+              </p>
+
+              <div className="flex gap-4">
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="flex-1 py-4 border border-white/5 rounded-2xl text-[10px] uppercase tracking-widest font-black text-gray-500 hover:bg-white/5 transition-all outline-none"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleConfirm}
+                  className={`flex-1 py-4 rounded-2xl text-[10px] uppercase tracking-widest font-black transition-all shadow-lg ${
+                    actionType === "available"
+                      ? "bg-green-500 text-black shadow-green-500/20"
+                      : "bg-red-500 text-white shadow-red-500/20"
+                  }`}
+                >
+                  Confirm
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Toast Notification */}
       <AnimatePresence>

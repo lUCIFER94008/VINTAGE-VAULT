@@ -5,10 +5,18 @@ import cloudinary from "@/lib/cloudinary";
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(req) {
   try {
     await connectDB();
-    const products = await Product.find({}).sort({ createdAt: -1 });
+    const { searchParams } = new URL(req.url);
+    const category = searchParams.get('category');
+    
+    let query = {};
+    if (category) {
+      query.category = category;
+    }
+
+    const products = await Product.find(query).sort({ createdAt: -1 });
     return NextResponse.json({ success: true, data: products });
   } catch (error) {
     return NextResponse.json({ success: false, error: error.message }, { status: 400 });
