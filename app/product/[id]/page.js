@@ -59,21 +59,19 @@ export default function ProductDetailPage() {
   }
 
   const handleSizeSelection = (size) => {
-    console.log("Selected Size:", size);
     setSelectedSize(size);
   };
 
-  const handleOrder = (e) => {
-    console.log("Order Event:", e);
+  const handleOrder = (event) => {
     if (!selectedSize) {
-      e.preventDefault();
+      event.preventDefault();
       setError("Please select a size first");
       setTimeout(() => setError(null), 3000);
       return;
     }
   };
 
-  const whatsappMessage = `Hi, I want to order "${product.name}"${selectedSize ? ` (Size: ${selectedSize.size})` : ''} (Price: ₹${product.price}). Is it available?`;
+  const whatsappMessage = `Hi, I want to order "${product.name}"${selectedSize ? ` (Size: ${selectedSize})` : ''} (Price: ₹${product.price}). Is it available?`;
   const whatsappUrl = `https://wa.me/919605333248?text=${encodeURIComponent(whatsappMessage)}`;
 
   return (
@@ -151,59 +149,45 @@ export default function ProductDetailPage() {
           <div className="mb-10">
             <div className="flex justify-between items-end mb-4 italic">
               <h3 className="text-[10px] uppercase tracking-[0.3em] text-gray-400 font-bold">Select Size</h3>
-              {selectedSize && (
-                <span className={`text-[9px] font-bold uppercase tracking-widest ${selectedSize.stock < 5 ? 'text-red-400 animate-pulse' : 'text-gold'}`}>
-                  {selectedSize.stock < 5 ? `Only ${selectedSize.stock} left in stock!` : `${selectedSize.stock} items available`}
-                </span>
-              )}
+              <span className="text-[9px] font-bold uppercase tracking-widest text-gold opacity-60">Handpicked Dimensions</span>
             </div>
             
             <div className="flex flex-wrap gap-3">
               {(product.sizes && product.sizes.length > 0) ? (
-                product.sizes.map((s) => {
-                  const isOutOfStock = s.stock <= 0;
-                  const isSelected = selectedSize?.size === s.size;
+                product.sizes.map((size) => {
+                  const isSelected = selectedSize === size;
                   
                   return (
                     <button
-                      key={s.size}
-                      disabled={isOutOfStock}
-                      onClick={() => handleSizeSelection(s)}
+                      key={size}
+                      onClick={() => handleSizeSelection(size)}
                       className={`
-                        min-w-[56px] h-14 flex flex-col items-center justify-center rounded-xl border-2 transition-all duration-300
+                        min-w-[56px] h-14 flex items-center justify-center rounded-xl border-2 transition-all duration-300
                         ${isSelected 
                           ? 'bg-gold border-gold text-black shadow-[0_0_20px_rgba(212,175,55,0.3)] scale-105' 
-                          : isOutOfStock
-                            ? 'border-white/5 text-white/20 cursor-not-allowed bg-white/5 opacity-50'
-                            : 'border-white/10 text-white hover:border-gold/50 hover:bg-white/5'
+                          : 'border-white/10 text-white hover:border-gold/50 hover:bg-white/5'
                         }
                       `}
                     >
-                      <span className="text-sm font-black uppercase tracking-widest">{s.size}</span>
-                      {isOutOfStock && <span className="text-[7px] font-bold mt-0.5 opacity-60">OUT</span>}
+                      <span className="text-sm font-black uppercase tracking-widest">{size}</span>
                     </button>
                   );
                 })
               ) : (
-                <p className="text-[10px] text-red-500/70 uppercase tracking-widest font-bold border border-red-500/20 px-4 py-2 rounded-lg bg-red-500/5">
-                  Stock status: checking vault...
-                </p>
+                <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Standard Size</p>
               )}
             </div>
             
-            <AnimatePresence>
-              {error && (
-                <motion.p 
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  className="text-red-400 text-[10px] mt-4 font-bold uppercase tracking-widest flex items-center"
-                >
-                  <AlertTriangle size={12} className="mr-2" />
-                  {error}
-                </motion.p>
-              )}
-            </AnimatePresence>
+            {error && (
+              <motion.p 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-red-400 text-[10px] mt-4 font-bold uppercase tracking-widest flex items-center"
+              >
+                <AlertTriangle size={12} className="mr-2" />
+                {error}
+              </motion.p>
+            )}
           </div>
 
           <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" onClick={handleOrder}>

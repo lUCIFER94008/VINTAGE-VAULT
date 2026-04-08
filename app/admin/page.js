@@ -17,12 +17,7 @@ export default function AdminPage() {
     description: '',
     category: '5 Sleeve Jersey',
     files: [], // Array of File objects for NEW uploads
-    sizes: [
-      { size: 'S', stock: 0, enabled: false },
-      { size: 'M', stock: 0, enabled: false },
-      { size: 'L', stock: 0, enabled: false },
-      { size: 'XL', stock: 0, enabled: false }
-    ]
+    sizes: [] // Array of active size strings (e.g. ["S", "M"])
   });
   const [previews, setPreviews] = useState([]); // Array of strings (Cloudinary URLs or local blobs)
   const [loading, setLoading] = useState(false);
@@ -96,20 +91,7 @@ export default function AdminPage() {
     });
     setPreviews(product.images || [product.image]); // Handle migration fallback
     
-    // Load existing sizes if they exist
-    const defaultSizes = [
-      { size: 'S', stock: 0, enabled: false },
-      { size: 'M', stock: 0, enabled: false },
-      { size: 'L', stock: 0, enabled: false },
-      { size: 'XL', stock: 0, enabled: false }
-    ];
-    
-    const loadedSizes = defaultSizes.map(ds => {
-      const found = product.sizes?.find(s => s.size === ds.size);
-      return found ? { ...ds, stock: found.stock, enabled: true } : ds;
-    });
-
-    setFormData(prev => ({ ...prev, sizes: loadedSizes }));
+    setFormData(prev => ({ ...prev, sizes: product.sizes || [] }));
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -149,20 +131,13 @@ export default function AdminPage() {
     }
   };
 
-  const handleSizeToggle = (e, index) => {
-    console.log("Toggle Event:", e);
-    const checked = e.target.checked;
-    const newSizes = [...formData.sizes];
-    newSizes[index].enabled = checked;
-    setFormData({ ...formData, sizes: newSizes });
-  };
-
-  const handleStockUpdate = (e, index) => {
-    console.log("Stock Update Event:", e);
-    const value = e.target.value;
-    const newSizes = [...formData.sizes];
-    newSizes[index].stock = value;
-    setFormData({ ...formData, sizes: newSizes });
+  const handleSizeChange = (size) => {
+    setFormData(prev => ({
+      ...prev,
+      sizes: prev.sizes.includes(size)
+        ? prev.sizes.filter(s => s !== size)
+        : [...prev.sizes, size]
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -206,7 +181,7 @@ export default function AdminPage() {
             description: formData.description,
             category: formData.category,
             images: finalImages,
-            sizes: formData.sizes.filter(s => s.enabled).map(s => ({ size: s.size, stock: parseInt(s.stock) || 0 })),
+            sizes: formData.sizes,
           }),
         });
 
@@ -214,7 +189,7 @@ export default function AdminPage() {
         if (result.success) {
           setToast({ message: 'Item Updated!', type: 'success' });
           setEditingId(null);
-          setFormData({ name: '', price: '', description: '', category: '5 Sleeve Jersey', files: [] });
+          setFormData({ name: '', price: '', description: '', category: '5 Sleeve Jersey', files: [], sizes: [] });
           setPreviews([]);
           fetchRecentProducts();
         }
@@ -231,7 +206,7 @@ export default function AdminPage() {
         data.append('price', formData.price);
         data.append('description', formData.description);
         data.append('category', formData.category);
-        data.append('sizes', JSON.stringify(formData.sizes.filter(s => s.enabled).map(s => ({ size: s.size, stock: parseInt(s.stock) || 0 }))));
+        data.append('sizes', JSON.stringify(formData.sizes));
         formData.files.forEach(file => data.append('file', file));
 
         const res = await fetch('/api/products', {
@@ -242,7 +217,7 @@ export default function AdminPage() {
         const result = await res.json();
         if (result.success) {
           setToast({ message: 'Product Added Successfully!', type: 'success' });
-          setFormData({ name: '', price: '', description: '', category: '5 Sleeve Jersey', files: [] });
+          setFormData({ name: '', price: '', description: '', category: '5 Sleeve Jersey', files: [], sizes: [] });
           setPreviews([]);
           fetchRecentProducts();
         } else {
@@ -408,29 +383,19 @@ export default function AdminPage() {
               {/* Size Management */}
               <div className="pt-4 border-t border-white/5">
                 <label className="block text-[10px] uppercase tracking-widest text-gold font-bold mb-6">Available Sizes & Stock</label>
-                <div className="grid grid-cols-2 gap-x-8 gap-y-4">
-                  {formData.sizes.map((s, index) => (
-                    <div key={s.size} className="flex items-center justify-between group">
-                      <div className="flex items-center space-x-3">
-                        <input 
-                          type="checkbox" 
-                          checked={s.enabled}
-                          onChange={(e) => handleSizeToggle(e, index)}
-                          className="w-4 h-4 rounded border-white/10 bg-black text-gold focus:ring-gold focus:ring-offset-black transition cursor-pointer"
-                        />
-                        <span className={`text-xs font-bold uppercase ${s.enabled ? 'text-white' : 'text-gray-600'}`}>{s.size}</span>
-                      </div>
-                      <div className={`transition-all duration-300 ${s.enabled ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-                        <input 
-                          type="number" 
-                          min="0"
-                          value={s.stock}
-                          onChange={(e) => handleStockUpdate(e, index)}
-                          placeholder="Stock"
-                          className="w-20 bg-black border border-white/5 group-hover:border-gold/30 rounded-lg px-3 py-1.5 text-xs focus:border-gold outline-none transition text-center"
-                        />
-                      </div>
-                    </div>
+                <div className="flex flex-wrap gap-4">
+                  {['S', 'M', 'L', 'XL'].map((size) => (
+                    <label key={size} className="flex items-center space-x-3 cursor-pointer group">
+                      <input 
+                        type="checkbox" 
+                        checked={formData.sizes.includes(size)}
+                        onChange={() => handleSizeChange(size)}
+                        className="w-5 h-5 rounded border-white/10 bg-black text-gold focus:ring-gold focus:ring-offset-black transition"
+                      />
+                      <span className={`text-sm font-bold uppercase transition-colors ${formData.sizes.includes(size) ? 'text-white' : 'text-gray-600 group-hover:text-gray-400'}`}>
+                        {size}
+                      </span>
+                    </label>
                   ))}
                 </div>
               </div>
@@ -456,7 +421,7 @@ export default function AdminPage() {
             {editingId && (
               <button 
                 type="button" 
-                onClick={() => { setEditingId(null); setFormData({name:'', price:'', description:'', category:'5 Sleeve Jersey', files:[]}); setPreviews([]); }}
+                onClick={() => { setEditingId(null); setFormData({name:'', price:'', description:'', category:'5 Sleeve Jersey', files:[], sizes:[]}); setPreviews([]); }}
                 className="w-full mt-4 text-[10px] uppercase tracking-widest text-gray-500 font-bold hover:text-white transition"
               >
                 Cancel Editing
@@ -509,13 +474,13 @@ export default function AdminPage() {
                   {/* Stock Display List */}
                   <div className="flex flex-wrap gap-1.5 mb-6">
                     {product.sizes?.length > 0 ? (
-                      product.sizes.map(s => (
-                        <span key={s.size} className={`text-[8px] font-black uppercase tracking-widest px-2 py-1 rounded-md border ${s.stock > 0 ? 'bg-white/5 border-white/10 text-gray-400' : 'bg-red-500/5 border-red-500/20 text-red-500/50'}`}>
-                          {s.size} ({s.stock > 0 ? s.stock : 'OOS'})
+                      product.sizes.map(size => (
+                        <span key={size} className="text-[8px] font-black uppercase tracking-widest px-2 py-1 rounded-md border bg-white/5 border-white/10 text-gray-400">
+                          {size}
                         </span>
                       ))
                     ) : (
-                      <span className="text-[8px] text-gray-600 uppercase font-bold tracking-widest">No sizes defined</span>
+                      <span className="text-[8px] text-gray-600 uppercase font-bold tracking-widest">Global Size</span>
                     )}
                   </div>
                   

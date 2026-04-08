@@ -28,22 +28,13 @@ const ProductSchema = new mongoose.Schema({
       type: Boolean,
       default: true,
     },
-    sizes: [
-      {
-        size: { type: String, required: true },
-        stock: { type: Number, default: 0 }
-      }
-    ],
+    sizes: {
+      type: [String],
+      default: []
+    },
 }, {
   timestamps: true,
 });
 
-ProductSchema.pre('save', function(next) {
-  if (this.sizes && this.sizes.length > 0) {
-    const totalStock = this.sizes.reduce((acc, s) => acc + s.stock, 0);
-    this.available = totalStock > 0;
-  }
-  next();
-});
 
 export default mongoose.models.Product || mongoose.model('Product', ProductSchema);
