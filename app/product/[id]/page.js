@@ -58,7 +58,13 @@ export default function ProductDetailPage() {
     );
   }
 
+  const handleSizeSelection = (size) => {
+    console.log("Selected Size:", size);
+    setSelectedSize(size);
+  };
+
   const handleOrder = (e) => {
+    console.log("Order Event:", e);
     if (!selectedSize) {
       e.preventDefault();
       setError("Please select a size first");
@@ -162,7 +168,7 @@ export default function ProductDetailPage() {
                     <button
                       key={s.size}
                       disabled={isOutOfStock}
-                      onClick={() => setSelectedSize(s)}
+                      onClick={() => handleSizeSelection(s)}
                       className={`
                         min-w-[56px] h-14 flex flex-col items-center justify-center rounded-xl border-2 transition-all duration-300
                         ${isSelected 

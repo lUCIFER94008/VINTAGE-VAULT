@@ -149,6 +149,22 @@ export default function AdminPage() {
     }
   };
 
+  const handleSizeToggle = (e, index) => {
+    console.log("Toggle Event:", e);
+    const checked = e.target.checked;
+    const newSizes = [...formData.sizes];
+    newSizes[index].enabled = checked;
+    setFormData({ ...formData, sizes: newSizes });
+  };
+
+  const handleStockUpdate = (e, index) => {
+    console.log("Stock Update Event:", e);
+    const value = e.target.value;
+    const newSizes = [...formData.sizes];
+    newSizes[index].stock = value;
+    setFormData({ ...formData, sizes: newSizes });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -399,11 +415,7 @@ export default function AdminPage() {
                         <input 
                           type="checkbox" 
                           checked={s.enabled}
-                          onChange={(e) => {
-                            const newSizes = [...formData.sizes];
-                            newSizes[index].enabled = e.target.checked;
-                            setFormData({...formData, sizes: newSizes});
-                          }}
+                          onChange={(e) => handleSizeToggle(e, index)}
                           className="w-4 h-4 rounded border-white/10 bg-black text-gold focus:ring-gold focus:ring-offset-black transition cursor-pointer"
                         />
                         <span className={`text-xs font-bold uppercase ${s.enabled ? 'text-white' : 'text-gray-600'}`}>{s.size}</span>
@@ -413,11 +425,7 @@ export default function AdminPage() {
                           type="number" 
                           min="0"
                           value={s.stock}
-                          onChange={(e) => {
-                            const newSizes = [...formData.sizes];
-                            newSizes[index].stock = e.target.value;
-                            setFormData({...formData, sizes: newSizes});
-                          }}
+                          onChange={(e) => handleStockUpdate(e, index)}
                           placeholder="Stock"
                           className="w-20 bg-black border border-white/5 group-hover:border-gold/30 rounded-lg px-3 py-1.5 text-xs focus:border-gold outline-none transition text-center"
                         />
