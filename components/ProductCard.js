@@ -27,9 +27,16 @@ export default function ProductCard({ product }) {
           <p className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mb-4">
             {product.category}
           </p>
-          <div className="flex justify-between items-center">
-            <p className="text-white font-black text-2xl italic tracking-tighter">₹{product.price}</p>
-            <div className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center group-hover:bg-gold group-hover:text-black transition-all">
+          <div className="flex justify-between items-center space-x-2">
+            <div>
+              <p className="text-white font-black text-2xl italic tracking-tighter">₹{product.price}</p>
+              {product.sizes && product.sizes.length > 0 && (
+                <p className="text-gray-500 text-[8px] font-black uppercase tracking-widest mt-1">
+                  {product.sizes.join(", ")}
+                </p>
+              )}
+            </div>
+            <div className="w-8 h-8 flex-shrink-0 rounded-full border border-white/10 flex items-center justify-center group-hover:bg-gold group-hover:text-black transition-all">
                <span className="text-xs">→</span>
             </div>
           </div>

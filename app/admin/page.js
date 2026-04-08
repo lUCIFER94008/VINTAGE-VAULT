@@ -147,12 +147,20 @@ export default function AdminPage() {
   };
 
   const handleSizeChange = (size) => {
-    setFormData(prev => ({
-      ...prev,
-      sizes: prev.sizes.includes(size)
-        ? prev.sizes.filter(s => s !== size)
-        : [...prev.sizes, size]
-    }));
+    setFormData(prev => {
+      let newSizes;
+      if (size === "FREE SIZE") {
+        // If clicking FREE SIZE, it becomes the only size, or clears if already selected
+        newSizes = prev.sizes.includes("FREE SIZE") ? [] : ["FREE SIZE"];
+      } else {
+        // If clicking any other size, remove FREE SIZE and toggle current size
+        const filtered = prev.sizes.filter(s => s !== "FREE SIZE");
+        newSizes = filtered.includes(size)
+          ? filtered.filter(s => s !== size)
+          : [...filtered, size];
+      }
+      return { ...prev, sizes: newSizes };
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -399,7 +407,7 @@ export default function AdminPage() {
               <div className="pt-4 border-t border-white/5">
                 <label className="block text-[10px] uppercase tracking-widest text-gold font-bold mb-6">Available Sizes & Stock</label>
                 <div className="flex flex-wrap gap-4">
-                  {['S', 'M', 'L', 'XL'].map((size) => (
+                  {['S', 'M', 'L', 'XL', 'FREE SIZE'].map((size) => (
                     <label key={size} className="flex items-center space-x-3 cursor-pointer group">
                       <input 
                         type="checkbox" 

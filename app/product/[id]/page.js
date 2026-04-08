@@ -156,16 +156,19 @@ export default function ProductDetailPage() {
               {(product.sizes && product.sizes.length > 0) ? (
                 product.sizes.map((size) => {
                   const isSelected = selectedSize === size;
+                  const isFreeSize = size === "FREE SIZE";
                   
                   return (
                     <button
                       key={size}
                       onClick={() => handleSizeSelection(size)}
                       className={`
-                        min-w-[56px] h-14 flex items-center justify-center rounded-xl border-2 transition-all duration-300
+                        min-w-[56px] h-14 px-6 flex items-center justify-center rounded-xl border-2 transition-all duration-300
                         ${isSelected 
                           ? 'bg-gold border-gold text-black shadow-[0_0_20px_rgba(212,175,55,0.3)] scale-105' 
-                          : 'border-white/10 text-white hover:border-gold/50 hover:bg-white/5'
+                          : isFreeSize
+                            ? 'bg-gold/10 border-gold/50 text-gold shadow-[0_0_15px_rgba(212,175,55,0.1)]'
+                            : 'border-white/10 text-white hover:border-gold/50 hover:bg-white/5'
                         }
                       `}
                     >
@@ -174,7 +177,7 @@ export default function ProductDetailPage() {
                   );
                 })
               ) : (
-                <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Standard Size</p>
+                <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">No Size Specified</p>
               )}
             </div>
             
