@@ -14,9 +14,10 @@ const ProductSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please provide a description.'],
   },
-  image: {
-    type: String, // Cloudinary URL
-    required: [true, 'Please provide an image URL.'],
+  images: {
+    type: [String], // Cloudinary URLs
+    required: [true, 'Please provide at least one image URL.'],
+    validate: [val => val.length > 0, 'Minimum 1 image required']
   },
     category: {
       type: String,

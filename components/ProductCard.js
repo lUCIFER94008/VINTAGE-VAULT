@@ -12,7 +12,7 @@ export default function ProductCard({ product }) {
     >
       <div className="aspect-[3/4] relative overflow-hidden bg-[#111]">
         <Image
-          src={product.image}
+          src={(product.images && product.images.length > 0) ? product.images[0] : product.image}
           alt={product.name}
           fill
           className={`object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out ${product.available === false ? 'grayscale-[0.5] opacity-60' : ''}`}

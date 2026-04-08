@@ -9,6 +9,7 @@ export default function ProductDetailPage() {
   const params = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [selectedImage, setSelectedImage] = useState(0);
 
   useEffect(() => {
     async function fetchProduct() {
@@ -66,22 +67,42 @@ export default function ProductDetailPage() {
       </Link>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-        {/* Product Image */}
-        <motion.div 
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="relative aspect-[3/4] rounded-3xl overflow-hidden border border-white/5 shadow-2xl bg-[#0a0a0a]"
-        >
-          <img 
-            src={product.image} 
-            alt={product.name}
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute top-6 left-6 bg-black/60 backdrop-blur-md px-4 py-2 rounded-full border border-gold/20 flex items-center space-x-2">
-            <ShieldCheck size={14} className="text-gold" />
-            <span className="text-[10px] font-bold text-gold uppercase tracking-[0.2em]">Verified Authenticity</span>
-          </div>
-        </motion.div>
+        <div className="flex flex-col space-y-4">
+          {/* Main Image */}
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            key={selectedImage}
+            className="relative aspect-[3/4] rounded-3xl overflow-hidden border border-white/5 shadow-2xl bg-[#0a0a0a]"
+          >
+            <img 
+              src={(product.images && product.images.length > 0) ? product.images[selectedImage] : product.image} 
+              alt={product.name}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute top-6 left-6 bg-black/60 backdrop-blur-md px-4 py-2 rounded-full border border-gold/20 flex items-center space-x-2">
+              <ShieldCheck size={14} className="text-gold" />
+              <span className="text-[10px] font-bold text-gold uppercase tracking-[0.2em]">Verified Authenticity</span>
+            </div>
+          </motion.div>
+
+          {/* Thumbnails */}
+          {product.images && product.images.length > 1 && (
+            <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+              {product.images.map((img, index) => (
+                <button
+                  key={index}
+                  onClick={() => setSelectedImage(index)}
+                  className={`relative flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all ${
+                    selectedImage === index ? 'border-gold brightness-110' : 'border-white/10 opacity-60 hover:opacity-100 hover:border-white/30'
+                  }`}
+                >
+                  <img src={img} className="w-full h-full object-cover" alt={`${product.name} ${index + 1}`} />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* Product Details */}
         <motion.div 

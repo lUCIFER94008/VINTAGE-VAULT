@@ -16,9 +16,9 @@ export default function AdminPage() {
     price: '',
     description: '',
     category: '5 Sleeve Jersey',
-    file: null
+    files: [] // Array of File objects for NEW uploads
   });
-  const [preview, setPreview] = useState(null);
+  const [previews, setPreviews] = useState([]); // Array of strings (Cloudinary URLs or local blobs)
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
 
@@ -51,10 +51,31 @@ export default function AdminPage() {
   };
 
   const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0];
-    if (selectedFile) {
-      setFormData({ ...formData, file: selectedFile });
-      setPreview(URL.createObjectURL(selectedFile));
+    const selectedFiles = Array.from(e.target.files);
+    if (selectedFiles.length > 0) {
+      // Validate max 5 images total (new + existing)
+      if (previews.length + selectedFiles.length > 5) {
+        alert("Maximum 5 images allowed per product.");
+        return;
+      }
+
+      setFormData({ ...formData, files: [...formData.files, ...selectedFiles] });
+      
+      const newPreviews = selectedFiles.map(file => URL.createObjectURL(file));
+      setPreviews([...previews, ...newPreviews]);
+    }
+  };
+
+  const removeImage = (index) => {
+    const removedPreview = previews[index];
+    const newPreviews = previews.filter((_, i) => i !== index);
+    setPreviews(newPreviews);
+
+    if (removedPreview.startsWith('blob:')) {
+      const blobIndex = previews.slice(0, index).filter(p => p.startsWith('blob:')).length;
+      const newFiles = [...formData.files];
+      newFiles.splice(blobIndex, 1);
+      setFormData({ ...formData, files: newFiles });
     }
   };
 
@@ -65,9 +86,9 @@ export default function AdminPage() {
       price: product.price,
       description: product.description,
       category: product.category,
-      file: null // Will keep existing image unless new one selected
+      files: [] // No new files yet
     });
-    setPreview(product.image);
+    setPreviews(product.images || [product.image]); // Handle migration fallback
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -114,6 +135,31 @@ export default function AdminPage() {
     try {
       if (editingId) {
         // Handle Edit (Update)
+        // First upload new files to Cloudinary if any
+        let finalImages = previews.filter(p => p.startsWith('http')); // Keep existing Cloudinary URLs
+        
+        if (formData.files.length > 0) {
+          const uploadData = new FormData();
+          formData.files.forEach(file => uploadData.append('file', file));
+          
+          const uploadRes = await fetch('/api/products', {
+            method: 'POST',
+            body: uploadData,
+          });
+          const uploadResult = await uploadRes.json();
+          if (uploadResult.success) {
+            finalImages = [...finalImages, ...uploadResult.data.images];
+          } else {
+            throw new Error(uploadResult.error || "Failed to upload new images");
+          }
+        }
+
+        if (finalImages.length === 0) {
+          alert('Please provide at least one image');
+          setLoading(false);
+          return;
+        }
+
         const res = await fetch(`/api/products/${editingId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -122,9 +168,7 @@ export default function AdminPage() {
             price: formData.price,
             description: formData.description,
             category: formData.category,
-            // image update via normal UI logic would be more complex, 
-            // but the user's snippet doesn't show image editing for the Put.
-            // I'll keep the current image if no file selected.
+            images: finalImages,
           }),
         });
 
@@ -132,14 +176,14 @@ export default function AdminPage() {
         if (result.success) {
           setToast({ message: 'Item Updated!', type: 'success' });
           setEditingId(null);
-          setFormData({ name: '', price: '', description: '', category: '5 Sleeve Jersey', file: null });
-          setPreview(null);
+          setFormData({ name: '', price: '', description: '', category: '5 Sleeve Jersey', files: [] });
+          setPreviews([]);
           fetchRecentProducts();
         }
       } else {
         // Handle Create
-        if (!formData.file) {
-           alert('Please select an image');
+        if (formData.files.length === 0) {
+           alert('Please select at least one image');
            setLoading(false);
            return;
         }
@@ -149,7 +193,7 @@ export default function AdminPage() {
         data.append('price', formData.price);
         data.append('description', formData.description);
         data.append('category', formData.category);
-        data.append('file', formData.file);
+        formData.files.forEach(file => data.append('file', file));
 
         const res = await fetch('/api/products', {
           method: 'POST',
@@ -159,15 +203,15 @@ export default function AdminPage() {
         const result = await res.json();
         if (result.success) {
           setToast({ message: 'Product Added Successfully!', type: 'success' });
-          setFormData({ name: '', price: '', description: '', category: '5 Sleeve Jersey', file: null });
-          setPreview(null);
+          setFormData({ name: '', price: '', description: '', category: '5 Sleeve Jersey', files: [] });
+          setPreviews([]);
           fetchRecentProducts();
         } else {
           setToast({ message: result.error || 'Failed to add product', type: 'error' });
         }
       }
     } catch (error) {
-      setToast({ message: 'Error in vault operation', type: 'error' });
+      setToast({ message: error.message || 'Error in vault operation', type: 'error' });
     } finally {
       setLoading(false);
       setTimeout(() => setToast(null), 3000);
@@ -214,24 +258,44 @@ export default function AdminPage() {
           <div className="space-y-6">
             <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-gold mb-4">Product Visuals</h3>
             
-            <div className="relative aspect-[3/4] w-full bg-[#111] rounded-2xl border-2 border-dashed border-white/10 flex flex-col items-center justify-center overflow-hidden group hover:border-gold/30 transition-all cursor-pointer">
-              {preview ? (
-                <>
-                  <img src={preview} className="w-full h-full object-cover" alt="Preview" />
-                  <button 
-                    onClick={() => { setFile(null); setPreview(null); }}
-                    className="absolute top-4 right-4 bg-black/80 p-2 rounded-full text-white hover:text-red-500 transition"
-                  >
-                    <X size={20} />
-                  </button>
-                </>
+            <div className={`relative min-h-[300px] w-full bg-[#111] rounded-2xl border-2 border-dashed border-white/10 flex flex-col items-center justify-center overflow-hidden p-4 group hover:border-gold/30 transition-all ${previews.length === 0 ? 'cursor-pointer' : ''}`}>
+              {previews.length > 0 ? (
+                <div className="w-full">
+                  <div className="grid grid-cols-3 gap-2 mb-4">
+                    {previews.map((src, index) => (
+                      <div key={index} className="relative aspect-square rounded-md overflow-hidden bg-black border border-white/5">
+                        <img src={src} className="w-full h-full object-cover" alt={`Preview ${index}`} />
+                        <button 
+                          type="button"
+                          onClick={() => removeImage(index)}
+                          className="absolute top-1 right-1 bg-black/80 p-1 rounded-full text-white hover:text-red-500 transition shadow-lg"
+                        >
+                          <X size={12} />
+                        </button>
+                      </div>
+                    ))}
+                    {previews.length < 5 && (
+                      <div className="relative aspect-square rounded-md border border-dashed border-white/20 flex items-center justify-center hover:border-gold/50 cursor-pointer overflow-hidden group">
+                        <Upload size={16} className="text-gray-600 group-hover:text-gold transition" />
+                        <input 
+                          type="file" 
+                          multiple
+                          onChange={handleFileChange} 
+                          className="absolute inset-0 opacity-0 cursor-pointer"
+                          accept="image/*"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
               ) : (
                 <>
                   <ImageIcon size={48} className="text-gray-600 mb-4 group-hover:text-gold transition" />
-                  <p className="text-xs text-gray-500 uppercase tracking-widest font-semibold">Upload Image</p>
-                  <p className="text-[10px] text-gray-700 mt-2 uppercase">PNG, JPG up to 10MB</p>
+                  <p className="text-xs text-gray-500 uppercase tracking-widest font-semibold">Upload Product Images</p>
+                  <p className="text-[10px] text-gray-700 mt-2 uppercase">Up to 5 images • PNG, JPG</p>
                   <input 
                     type="file" 
+                    multiple
                     onChange={handleFileChange} 
                     className="absolute inset-0 opacity-0 cursor-pointer"
                     accept="image/*"
@@ -323,7 +387,7 @@ export default function AdminPage() {
             {editingId && (
               <button 
                 type="button" 
-                onClick={() => { setEditingId(null); setFormData({name:'', price:'', description:'', category:'5 Sleeve Jersey', file:null}); setPreview(null); }}
+                onClick={() => { setEditingId(null); setFormData({name:'', price:'', description:'', category:'5 Sleeve Jersey', files:[]}); setPreviews([]); }}
                 className="w-full mt-4 text-[10px] uppercase tracking-widest text-gray-500 font-bold hover:text-white transition"
               >
                 Cancel Editing
@@ -355,7 +419,12 @@ export default function AdminPage() {
                 className="bg-[#0a0a0a] border border-white/5 rounded-3xl overflow-hidden group hover:border-gold/30 transition-all shadow-xl"
               >
                 <div className="relative aspect-[4/3] overflow-hidden">
-                  <img src={product.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt={product.name} />
+                  <img src={product.images?.[0] || product.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt={product.name} />
+                  <div className="absolute top-4 left-4 flex gap-2">
+                    <div className={`bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10 text-[9px] font-black uppercase tracking-widest text-white`}>
+                      {product.images?.length || 1} {product.images?.length === 1 ? 'IMAGE' : 'IMAGES'}
+                    </div>
+                  </div>
                   <div className={`absolute top-4 right-4 ${product.available !== false ? 'bg-green-500/10 border-green-500/50 text-green-400' : 'bg-red-500/10 border-red-500/50 text-red-500'} backdrop-blur-md px-3 py-1 rounded-full border text-[9px] font-black uppercase tracking-widest`}>
                     {product.available !== false ? 'Available' : 'Out of Stock'}
                   </div>

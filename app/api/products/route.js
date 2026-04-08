@@ -25,31 +25,35 @@ export async function POST(req) {
     const price = data.get("price");
     const description = data.get("description");
     const category = data.get("category");
-    const file = data.get("file"); // Changed from 'image' to 'file' per user snippet
+    const files = data.getAll("file");
 
-    if (!file) {
-      return NextResponse.json({ error: "Please select an image" }, { status: 400 });
+    if (!files || files.length === 0) {
+      return NextResponse.json({ error: "Please select at least one image" }, { status: 400 });
     }
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    const imageUrls = [];
 
-    // Upload to Cloudinary using upload_stream
-    const uploadRes = await new Promise((resolve, reject) => {
-      cloudinary.uploader
-        .upload_stream({ folder: "vintage-vault" }, (err, result) => {
-          if (err) reject(err);
-          else resolve(result);
-        })
-        .end(buffer);
-    });
+    for (const file of files) {
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      const uploadRes = await new Promise((resolve, reject) => {
+        cloudinary.uploader
+          .upload_stream({ folder: "vintage-vault" }, (err, result) => {
+            if (err) reject(err);
+            else resolve(result);
+          })
+          .end(buffer);
+      });
+      imageUrls.push(uploadRes.secure_url);
+    }
 
     const product = await Product.create({
       name,
       price,
       description,
       category,
-      image: uploadRes.secure_url,
+      images: imageUrls,
     });
 
     return NextResponse.json({ success: true, data: product }, { status: 201 });
