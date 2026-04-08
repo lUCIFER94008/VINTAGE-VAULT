@@ -25,7 +25,10 @@ export async function POST(req) {
     const price = data.get("price");
     const description = data.get("description");
     const category = data.get("category");
+    const sizesStr = data.get("sizes");
     const files = data.getAll("file");
+
+    const sizes = sizesStr ? JSON.parse(sizesStr) : [];
 
     if (!files || files.length === 0) {
       return NextResponse.json({ error: "Please select at least one image" }, { status: 400 });
@@ -54,6 +57,7 @@ export async function POST(req) {
       description,
       category,
       images: imageUrls,
+      sizes,
     });
 
     return NextResponse.json({ success: true, data: product }, { status: 201 });

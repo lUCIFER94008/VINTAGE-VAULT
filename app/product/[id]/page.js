@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Loader2, IndianRupee, Smartphone, ArrowLeft, ShieldCheck } from 'lucide-react';
+import { Loader2, IndianRupee, Smartphone, ArrowLeft, ShieldCheck, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 
 export default function ProductDetailPage() {
@@ -10,6 +10,8 @@ export default function ProductDetailPage() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
+  const [selectedSize, setSelectedSize] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     async function fetchProduct() {
@@ -56,7 +58,16 @@ export default function ProductDetailPage() {
     );
   }
 
-  const whatsappMessage = `Hi, I want to order "${product.name}" (Price: ₹${product.price}). Is it available?`;
+  const handleOrder = (e) => {
+    if (!selectedSize) {
+      e.preventDefault();
+      setError("Please select a size first");
+      setTimeout(() => setError(null), 3000);
+      return;
+    }
+  };
+
+  const whatsappMessage = `Hi, I want to order "${product.name}"${selectedSize ? ` (Size: ${selectedSize.size})` : ''} (Price: ₹${product.price}). Is it available?`;
   const whatsappUrl = `https://wa.me/919605333248?text=${encodeURIComponent(whatsappMessage)}`;
 
   return (
@@ -130,23 +141,74 @@ export default function ProductDetailPage() {
             </p>
           </div>
 
-          {/* Size Selector Mockup */}
+          {/* Size Selector */}
           <div className="mb-10">
-            <h3 className="text-[10px] uppercase tracking-[0.3em] text-gray-400 font-bold mb-4 italic">Available Sizes</h3>
-            <div className="flex gap-4">
-              {['S', 'M', 'L', 'XL'].map(size => (
-                <div key={size} className="w-12 h-12 flex items-center justify-center border border-white/10 rounded-xl text-xs font-bold text-gray-400 hover:border-gold hover:text-gold transition-all cursor-pointer">
-                  {size}
-                </div>
-              ))}
+            <div className="flex justify-between items-end mb-4 italic">
+              <h3 className="text-[10px] uppercase tracking-[0.3em] text-gray-400 font-bold">Select Size</h3>
+              {selectedSize && (
+                <span className={`text-[9px] font-bold uppercase tracking-widest ${selectedSize.stock < 5 ? 'text-red-400 animate-pulse' : 'text-gold'}`}>
+                  {selectedSize.stock < 5 ? `Only ${selectedSize.stock} left in stock!` : `${selectedSize.stock} items available`}
+                </span>
+              )}
             </div>
+            
+            <div className="flex flex-wrap gap-3">
+              {(product.sizes && product.sizes.length > 0) ? (
+                product.sizes.map((s) => {
+                  const isOutOfStock = s.stock <= 0;
+                  const isSelected = selectedSize?.size === s.size;
+                  
+                  return (
+                    <button
+                      key={s.size}
+                      disabled={isOutOfStock}
+                      onClick={() => setSelectedSize(s)}
+                      className={`
+                        min-w-[56px] h-14 flex flex-col items-center justify-center rounded-xl border-2 transition-all duration-300
+                        ${isSelected 
+                          ? 'bg-gold border-gold text-black shadow-[0_0_20px_rgba(212,175,55,0.3)] scale-105' 
+                          : isOutOfStock
+                            ? 'border-white/5 text-white/20 cursor-not-allowed bg-white/5 opacity-50'
+                            : 'border-white/10 text-white hover:border-gold/50 hover:bg-white/5'
+                        }
+                      `}
+                    >
+                      <span className="text-sm font-black uppercase tracking-widest">{s.size}</span>
+                      {isOutOfStock && <span className="text-[7px] font-bold mt-0.5 opacity-60">OUT</span>}
+                    </button>
+                  );
+                })
+              ) : (
+                <p className="text-[10px] text-red-500/70 uppercase tracking-widest font-bold border border-red-500/20 px-4 py-2 rounded-lg bg-red-500/5">
+                  Stock status: checking vault...
+                </p>
+              )}
+            </div>
+            
+            <AnimatePresence>
+              {error && (
+                <motion.p 
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="text-red-400 text-[10px] mt-4 font-bold uppercase tracking-widest flex items-center"
+                >
+                  <AlertTriangle size={12} className="mr-2" />
+                  {error}
+                </motion.p>
+              )}
+            </AnimatePresence>
           </div>
 
-          <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+          <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" onClick={handleOrder}>
             <motion.button 
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full bg-white text-black py-5 rounded-2xl flex items-center justify-center space-x-4 text-sm font-black uppercase tracking-[0.2em] shadow-2xl hover:bg-gold transition-all"
+              className={`w-full py-5 rounded-2xl flex items-center justify-center space-x-4 text-sm font-black uppercase tracking-[0.2em] shadow-2xl transition-all ${
+                selectedSize 
+                  ? 'bg-white text-black hover:bg-gold' 
+                  : 'bg-white/5 text-white/30 border border-white/5 cursor-not-allowed'
+              }`}
             >
               <Smartphone size={18} />
               <span>Order via WhatsApp</span>

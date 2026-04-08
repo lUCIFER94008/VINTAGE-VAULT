@@ -16,7 +16,13 @@ export default function AdminPage() {
     price: '',
     description: '',
     category: '5 Sleeve Jersey',
-    files: [] // Array of File objects for NEW uploads
+    files: [], // Array of File objects for NEW uploads
+    sizes: [
+      { size: 'S', stock: 0, enabled: false },
+      { size: 'M', stock: 0, enabled: false },
+      { size: 'L', stock: 0, enabled: false },
+      { size: 'XL', stock: 0, enabled: false }
+    ]
   });
   const [previews, setPreviews] = useState([]); // Array of strings (Cloudinary URLs or local blobs)
   const [loading, setLoading] = useState(false);
@@ -89,6 +95,21 @@ export default function AdminPage() {
       files: [] // No new files yet
     });
     setPreviews(product.images || [product.image]); // Handle migration fallback
+    
+    // Load existing sizes if they exist
+    const defaultSizes = [
+      { size: 'S', stock: 0, enabled: false },
+      { size: 'M', stock: 0, enabled: false },
+      { size: 'L', stock: 0, enabled: false },
+      { size: 'XL', stock: 0, enabled: false }
+    ];
+    
+    const loadedSizes = defaultSizes.map(ds => {
+      const found = product.sizes?.find(s => s.size === ds.size);
+      return found ? { ...ds, stock: found.stock, enabled: true } : ds;
+    });
+
+    setFormData(prev => ({ ...prev, sizes: loadedSizes }));
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -169,6 +190,7 @@ export default function AdminPage() {
             description: formData.description,
             category: formData.category,
             images: finalImages,
+            sizes: formData.sizes.filter(s => s.enabled).map(s => ({ size: s.size, stock: parseInt(s.stock) || 0 })),
           }),
         });
 
@@ -193,6 +215,7 @@ export default function AdminPage() {
         data.append('price', formData.price);
         data.append('description', formData.description);
         data.append('category', formData.category);
+        data.append('sizes', JSON.stringify(formData.sizes.filter(s => s.enabled).map(s => ({ size: s.size, stock: parseInt(s.stock) || 0 }))));
         formData.files.forEach(file => data.append('file', file));
 
         const res = await fetch('/api/products', {
@@ -365,6 +388,44 @@ export default function AdminPage() {
                   className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-gold outline-none transition resize-none"
                 ></textarea>
               </div>
+
+              {/* Size Management */}
+              <div className="pt-4 border-t border-white/5">
+                <label className="block text-[10px] uppercase tracking-widest text-gold font-bold mb-6">Available Sizes & Stock</label>
+                <div className="grid grid-cols-2 gap-x-8 gap-y-4">
+                  {formData.sizes.map((s, index) => (
+                    <div key={s.size} className="flex items-center justify-between group">
+                      <div className="flex items-center space-x-3">
+                        <input 
+                          type="checkbox" 
+                          checked={s.enabled}
+                          onChange={(e) => {
+                            const newSizes = [...formData.sizes];
+                            newSizes[index].enabled = e.target.checked;
+                            setFormData({...formData, sizes: newSizes});
+                          }}
+                          className="w-4 h-4 rounded border-white/10 bg-black text-gold focus:ring-gold focus:ring-offset-black transition cursor-pointer"
+                        />
+                        <span className={`text-xs font-bold uppercase ${s.enabled ? 'text-white' : 'text-gray-600'}`}>{s.size}</span>
+                      </div>
+                      <div className={`transition-all duration-300 ${s.enabled ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+                        <input 
+                          type="number" 
+                          min="0"
+                          value={s.stock}
+                          onChange={(e) => {
+                            const newSizes = [...formData.sizes];
+                            newSizes[index].stock = e.target.value;
+                            setFormData({...formData, sizes: newSizes});
+                          }}
+                          placeholder="Stock"
+                          className="w-20 bg-black border border-white/5 group-hover:border-gold/30 rounded-lg px-3 py-1.5 text-xs focus:border-gold outline-none transition text-center"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
 
             <button 
@@ -435,7 +496,20 @@ export default function AdminPage() {
                     <h4 className="text-lg font-bold text-white tracking-tight line-clamp-1">{product.name}</h4>
                     <span className="text-gold font-bold">₹{product.price}</span>
                   </div>
-                  <p className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-6">{product.category}</p>
+                  <p className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-4">{product.category}</p>
+                  
+                  {/* Stock Display List */}
+                  <div className="flex flex-wrap gap-1.5 mb-6">
+                    {product.sizes?.length > 0 ? (
+                      product.sizes.map(s => (
+                        <span key={s.size} className={`text-[8px] font-black uppercase tracking-widest px-2 py-1 rounded-md border ${s.stock > 0 ? 'bg-white/5 border-white/10 text-gray-400' : 'bg-red-500/5 border-red-500/20 text-red-500/50'}`}>
+                          {s.size} ({s.stock > 0 ? s.stock : 'OOS'})
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-[8px] text-gray-600 uppercase font-bold tracking-widest">No sizes defined</span>
+                    )}
+                  </div>
                   
                   <div className="flex items-center space-x-3">
                     <button 
