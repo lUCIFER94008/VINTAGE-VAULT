@@ -1,44 +1,33 @@
-'use client';
-import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
 import ProductCard from '@/components/ProductCard';
-import { motion } from 'framer-motion';
-import { Loader2 } from 'lucide-react';
+import { Suspense } from 'react';
+import Link from 'next/link';
+import { Loader2, AlertTriangle } from 'lucide-react';
 
-function ProductsContent() {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const searchParams = useSearchParams();
-  const categoryFilter = searchParams.get('category');
-
-  useEffect(() => {
-    async function fetchProducts() {
-      try {
-        const url = categoryFilter 
-          ? `/api/products?category=${encodeURIComponent(categoryFilter)}`
-          : '/api/products';
-        const res = await fetch(url);
-        const data = await res.json();
-        if (data.success) {
-          setProducts(data.data);
-        }
-      } catch (error) {
-        console.error('Error fetching products:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchProducts();
-  }, [categoryFilter]);
-
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-black">
-        <Loader2 className="w-12 h-12 text-gold animate-spin mb-4" />
-        <p className="text-gray-400 uppercase tracking-widest text-xs">Entering the Vault...</p>
-      </div>
-    );
+async function getProducts(category) {
+  try {
+    // Note: In local dev, relative URLs for fetch work if configured, 
+    // but on server-side it typically needs a base URL.
+    // We follow your instruction to use relative /api/products paths.
+    // If this fails on your specific server, we'll shift to direct DB access.
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const url = category 
+      ? `${baseUrl}/api/products?category=${encodeURIComponent(category)}`
+      : `${baseUrl}/api/products`;
+      
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) throw new Error("Failed to fetch");
+    const result = await res.json();
+    return result.data || result;
+  } catch (error) {
+    console.error("Fetch error:", error);
+    return [];
   }
+}
+
+export default async function ProductsPage({ searchParams }) {
+  const params = await searchParams;
+  const categoryFilter = params?.category || "";
+  const products = await getProducts(categoryFilter);
 
   return (
     <div className="pt-32 pb-24 px-6 max-w-7xl mx-auto">
@@ -62,36 +51,19 @@ function ProductsContent() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-        {products.map((product, i) => (
-          <motion.div
-            key={product._id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 }}
-          >
-            <ProductCard product={product} />
-          </motion.div>
-        ))}
+        {products.length > 0 ? (
+          products.map((product) => (
+            <div key={product._id}>
+              <ProductCard product={product} />
+            </div>
+          ))
+        ) : (
+          <div className="col-span-full text-center py-24 bg-[#111] rounded-3xl border border-white/5">
+            <p className="text-gray-500 mb-4 tracking-widest uppercase text-sm">Nothing found in this section.</p>
+            <p className="text-gray-600 text-xs text-balance">We're constantly restocking. Check back soon or message us on WhatsApp.</p>
+          </div>
+        )}
       </div>
-
-      {products.length === 0 && (
-        <div className="text-center py-24 bg-[#111] rounded-3xl border border-white/5">
-          <p className="text-gray-500 mb-4 tracking-widest uppercase text-sm">Nothing found in this section.</p>
-          <p className="text-gray-600 text-xs text-balance">We're constantly restocking. Check back soon or message us on WhatsApp.</p>
-        </div>
-      )}
     </div>
-  );
-}
-
-export default function ProductsPage() {
-  return (
-    <Suspense fallback={
-      <div className="flex flex-col items-center justify-center min-h-screen bg-black">
-        <Loader2 className="w-12 h-12 text-gold animate-spin mb-4" />
-      </div>
-    }>
-      <ProductsContent />
-    </Suspense>
   );
 }

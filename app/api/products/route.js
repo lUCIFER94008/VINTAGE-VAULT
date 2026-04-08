@@ -11,14 +11,18 @@ export async function GET(req) {
     const { searchParams } = new URL(req.url);
     const category = searchParams.get('category');
     
+    // DEBUG LOG FOR VERCEL
+    console.log("CATEGORY:", category);
+    
     let query = {};
-    if (category) {
+    if (category && category !== "undefined" && category !== "null") {
       query.category = category;
     }
 
     const products = await Product.find(query).sort({ createdAt: -1 });
     return NextResponse.json({ success: true, data: products });
   } catch (error) {
+    console.error("Fetch Error:", error);
     return NextResponse.json({ success: false, error: error.message }, { status: 400 });
   }
 }
