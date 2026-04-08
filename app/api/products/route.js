@@ -13,23 +13,24 @@ export async function GET(req) {
     const isAdmin = searchParams.get('admin') === 'true';
     
     // DEBUG LOGS
-    console.log("CATEGORY:", category);
+    console.log("RAW_CATEGORY:", category);
+    console.log("DECODED_CATEGORY:", category ? decodeURIComponent(category) : null);
     console.log("IS_ADMIN:", isAdmin);
     
     let query = {};
-    if (category && category !== "undefined" && category !== "null") {
-      query.category = category;
+    if (category && category !== "undefined" && category !== "null" && category !== "") {
+      query.category = decodeURIComponent(category);
     }
 
-    // FILTER BY AVAILABILITY (Users only)
-    if (!isAdmin) {
-      query.available = true;
-    }
+    // ⚠️ TEMP: REMOVE AVAILABLE FILTER (TO DEBUG)
+    // if (!isAdmin) {
+    //   query.available = true;
+    // }
 
     console.log("FINAL QUERY:", query);
 
     const products = await Product.find(query).sort({ createdAt: -1 });
-    console.log("TOTAL PRODUCTS FOUND:", products.length);
+    console.log("FETCHED PRODUCTS COUNT:", products.length);
     
     return NextResponse.json({ success: true, data: products });
   } catch (error) {

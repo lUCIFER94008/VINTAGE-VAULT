@@ -117,13 +117,14 @@ export default function Home() {
                 <motion.div 
                   initial={{ opacity: 0, y: 15 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ delay: i * 0.05, duration: 0.3 }}
                   viewport={{ once: true }}
                   className="group relative h-[200px] sm:h-[240px] md:h-[260px] overflow-hidden rounded-xl cursor-pointer border border-white/5 transition-all duration-300"
                 >
                   <img 
                     src={cat.image} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 brightness-75" 
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 brightness-75" 
                     alt={cat.name}
                     loading="lazy"
                   />
@@ -144,7 +145,7 @@ export default function Home() {
                     </div>
                   </div>
                   
-                  <div className="absolute inset-0 ring-1 ring-inset ring-white/5 group-hover:ring-gold/30 transition-all duration-300 rounded-xl" />
+                  <div className="absolute inset-0 ring-1 ring-inset ring-white/5 group-hover:ring-gold/30 transition-all duration-300 rounded-xl shadow-2xl" />
                 </motion.div>
               </Link>
             ))}
