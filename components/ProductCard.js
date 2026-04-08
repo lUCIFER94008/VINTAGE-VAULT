@@ -1,53 +1,29 @@
-'use client';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import Image from 'next/image';
+import Link from "next/link";
 
 export default function ProductCard({ product }) {
   return (
-    <motion.div
-      whileHover={{ y: -5 }}
-      transition={{ duration: 0.3 }}
-      className="group bg-[#0a0a0a] rounded-xl overflow-hidden border border-white/5 hover:border-gold/30 transition-all duration-500 shadow-2xl relative"
-    >
-      <div className="aspect-[3/4] relative overflow-hidden bg-[#111]">
-        <Image
-          src={(product.images && product.images.length > 0) ? product.images[0] : product.image}
-          alt={product.name}
-          fill
-          className={`object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out ${product.available === false ? 'grayscale-[0.5] opacity-60' : ''}`}
-        />
-        <div className={`absolute top-4 right-4 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold border tracking-wider uppercase ${
-          product.available !== false 
-            ? 'bg-black/60 text-gold border-gold/20' 
-            : 'bg-red-500/20 text-red-500 border-red-500/30'
-        }`}>
-          {product.available !== false ? 'New Arrival' : 'Out of Stock'}
+    <Link href={`/product/${product._id}`}>
+      <div className="bg-[#0a0a0a] rounded-2xl overflow-hidden hover:scale-105 transition-all duration-300 border border-white/5 group shadow-2xl">
+        {/* 🔥 IMAGE */}
+        <div className="relative aspect-[4/3] overflow-hidden">
+          <img
+            src={product.images?.[0] || product.image}
+            alt={product.name}
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+          />
         </div>
-      </div>
 
-      <div className="p-5">
-        <div className="flex justify-between items-start mb-2">
-          <h3 className="text-lg font-semibold tracking-tight text-white group-hover:text-gold transition-colors duration-300 line-clamp-1">
+        {/* 🔥 DETAILS */}
+        <div className="p-5">
+          <h2 className="font-bold text-lg text-white group-hover:text-gold transition-colors line-clamp-1">
             {product.name}
-          </h3>
+          </h2>
+          <div className="flex justify-between items-center mt-3">
+             <p className="text-gold font-black text-xl italic tracking-tighter">₹{product.price}</p>
+             <span className="text-[10px] text-gray-600 uppercase font-black tracking-widest border border-white/5 px-2 py-1 rounded">Vault Piece</span>
+          </div>
         </div>
-        <p className="text-gold text-2xl font-bold tracking-tighter mb-4">
-          ₹{product.price}
-        </p>
-
-        <Link href={`/product/${product._id}`}>
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            className="w-full bg-white text-black text-xs font-bold uppercase tracking-widest py-3 rounded-lg hover:bg-gold transition-all duration-300"
-          >
-            View Details
-          </motion.button>
-        </Link>
       </div>
-
-      {/* Decorative Gradient Overlay */}
-      <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-transparent via-gold/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-    </motion.div>
+    </Link>
   );
 }

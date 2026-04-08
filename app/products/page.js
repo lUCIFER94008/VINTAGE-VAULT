@@ -1,93 +1,51 @@
-import ProductCard from '@/components/ProductCard';
-import FilterSidebar from '@/components/FilterSidebar';
-import { Suspense } from 'react';
+import ProductCard from "@/components/ProductCard";
 
-async function getProducts(category) {
+async function getProducts() {
   try {
-    // Note: Server-side fetch requires absolute URLs.
+    // Note: Server-side fetch requires absolute URLs. 
     // NEXT_PUBLIC_BASE_URL handles both local development and Vercel deployment.
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const url = category
-      ? `${baseUrl}/api/products?category=${encodeURIComponent(category)}`
-      : `${baseUrl}/api/products`;
-
-    const res = await fetch(url, { cache: "no-store" });
+    const res = await fetch(`${baseUrl}/api/products`, {
+      cache: "no-store",
+    });
 
     if (!res.ok) throw new Error("Failed to fetch products");
 
-    const result = await res.json();
+    const data = await res.json();
 
     // Supports both {success: true, data: []} and raw array responses
-    return result.data || result;
+    return data.data || data;
   } catch (error) {
-    console.error("Fetch error:", error);
+    console.error("Error fetching products:", error);
     return [];
   }
 }
 
-export default async function ProductsPage({ searchParams }) {
-  // In Next.js 15, searchParams is an async prop. 
-  // We handle it safely to support multiple versions.
-  const params = await searchParams || {};
-  const categoryFilter = params?.category || "";
-
-  const products = await getProducts(categoryFilter);
+export default async function ProductsPage() {
+  const products = await getProducts();
 
   return (
-    <div className="pt-32 pb-24 px-6 max-w-[1400px] mx-auto">
-      <div className="flex flex-col md:flex-row gap-12">
+    <div className="pt-32 pb-20 px-6 max-w-[1300px] mx-auto text-white">
+      {/* 🔥 TITLE */}
+      <div className="mb-10 flex items-center space-x-4">
+         <div className="h-12 w-2 bg-gold" />
+         <h1 className="text-4xl font-black italic uppercase tracking-tighter">
+           The Entire Vault
+         </h1>
+      </div>
 
-        {/* SIDEBAR */}
-        <div className="md:w-64 flex-shrink-0">
-          <Suspense fallback={<div className="h-64 bg-[#0a0a0a] animate-pulse rounded-2xl" />}>
-            <FilterSidebar />
-          </Suspense>
-        </div>
-
-        {/* MAIN CONTENT */}
-        <div className="flex-1">
-
-          {/* HEADER */}
-          <div className="mb-12">
-            <h1 className="text-4xl font-black tracking-tighter mb-4 flex items-center gap-4">
-              {categoryFilter ? (
-                <>
-                  <span className="text-gold">{categoryFilter.toUpperCase()}</span>
-                  <span className="text-white">COLLECTION</span>
-                </>
-              ) : (
-                "THE ENTIRE VAULT"
-              )}
-            </h1>
-
-            <p className="text-gray-400 uppercase tracking-widest text-[10px] font-bold">
-              {categoryFilter
-                ? `Exploring curated ${categoryFilter} fashion`
-                : "Our complete Surplus / Thrifted Fashion Collection"}
-            </p>
+      {/* 🔥 GRID */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {products.length > 0 ? (
+          products.map((product) => (
+            <ProductCard key={product._id} product={product} />
+          ))
+        ) : (
+          <div className="col-span-full text-center py-24 bg-[#0a0a0a] rounded-3xl border border-white/5 border-dashed">
+             <div className="text-gray-700 font-black text-6xl mb-4 opacity-50 uppercase tracking-tighter italic">Empty Vault</div>
+             <p className="text-gray-500 uppercase tracking-widest text-[10px] font-bold">No products detected. Check back for fresh inventory.</p>
           </div>
-
-          {/* PRODUCTS GRID */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {products.length > 0 ? (
-              products.map((product) => (
-                <div key={product._id}>
-                  <ProductCard product={product} />
-                </div>
-              ))
-            ) : (
-              <div className="col-span-full text-center py-24 bg-[#0a0a0a] rounded-3xl border border-white/5">
-                <p className="text-gray-500 mb-4 tracking-widest uppercase text-sm font-bold">
-                  The vault is currently empty.
-                </p>
-                <p className="text-gray-600 text-xs text-balance">
-                  We're constantly restocking. Check back soon for fresh drops.
-                </p>
-              </div>
-            )}
-          </div>
-
-        </div>
+        )}
       </div>
     </div>
   );
