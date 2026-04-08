@@ -6,12 +6,22 @@ import { Suspense } from "react";
 
 export const dynamic = "force-dynamic";
 
-export default async function ProductsPage() {
-  // Step 1: Connect to DB directly (No internal fetch)
+export default async function ProductsPage({ searchParams }) {
+  // Step 1: Connect to DB directly
   await connectDB();
 
-  // Step 2: Fetch products directly from MongoDB
-  const products = await Product.find({ available: true })
+  // Step 2: Handle searchParams (Next.js 15 requirement)
+  const params = await searchParams;
+  const category = params?.category;
+
+  // Step 3: Build dynamic query
+  let query = { available: true };
+  if (category) {
+    query.category = category;
+  }
+
+  // Step 4: Fetch filtered products
+  const products = await Product.find(query)
     .sort({ createdAt: -1 })
     .lean();
 
@@ -19,7 +29,7 @@ export default async function ProductsPage() {
     <div className="pt-32 pb-24 px-6 max-w-[1400px] mx-auto min-h-screen">
       <div className="flex flex-col md:flex-row gap-12">
         
-        {/* 🔥 SIDEBAR (STICKY ON DESKTOP) */}
+        {/* 🔥 SIDEBAR */}
         <div className="md:w-64 flex-shrink-0">
           <Suspense fallback={<div className="h-64 bg-[#0a0a0a] animate-pulse rounded-3xl border border-white/10" />}>
             <FilterSidebar />
@@ -31,18 +41,24 @@ export default async function ProductsPage() {
           {/* HEADER SECTION */}
           <div className="mb-12 flex items-center justify-between">
             <div>
-              <h1 className="text-5xl font-black italic uppercase tracking-tighter text-white mb-2">
-                THE ENTIRE <span className="text-gold">VAULT</span>
+              <h1 className="text-5xl font-black italic uppercase tracking-tighter text-white mb-2 leading-none">
+                {category ? (
+                  <>
+                    <span className="text-gold">{category.toUpperCase()}</span> COLLECTION
+                  </>
+                ) : (
+                  <>THE ENTIRE <span className="text-gold">VAULT</span></>
+                )}
               </h1>
               <p className="text-gray-500 text-[11px] font-black uppercase tracking-[0.4em]">
-                Surplus / Thrifted Fashion Collection
+                {category ? `Exploring the finest ${category} curation` : 'Surplus / Thrifted Fashion Collection'}
               </p>
             </div>
             
             <div className="hidden lg:flex items-center space-x-2 text-gray-500 font-bold text-[10px] uppercase tracking-widest">
               <span>{products.length} Items Found</span>
               <div className="w-1 h-1 bg-gold rounded-full" />
-              <span className="text-white">Sorted by Recent</span>
+              <span className="text-white">{category ? 'Filtered View' : 'All Access'}</span>
             </div>
           </div>
 
@@ -59,9 +75,9 @@ export default async function ProductsPage() {
                 <div className="bg-white/5 p-4 rounded-full mb-6">
                    <div className="w-12 h-12 border border-white/10 rounded-full animate-pulse" />
                 </div>
-                <h3 className="text-white font-black uppercase italic tracking-tighter text-3xl mb-2">The Vault is Locked</h3>
+                <h3 className="text-white font-black uppercase italic tracking-tighter text-3xl mb-2">Vault Section Locked</h3>
                 <p className="text-gray-600 text-[10px] font-bold uppercase tracking-widest max-w-xs mx-auto">
-                  We are currently refreshing our inventory. message us on whatsapp for exclusive early access.
+                  We are currently refreshing out curated collection of {category}. Message us for exclusive early access.
                 </p>
               </div>
             )}
