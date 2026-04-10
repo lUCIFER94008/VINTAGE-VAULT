@@ -62,17 +62,32 @@ export default function ProductDetailPage() {
     setSelectedSize(size);
   };
 
-  const handleOrder = (event) => {
+  const handleWhatsApp = () => {
     if (!selectedSize) {
-      event.preventDefault();
       setError("Please select a size first");
       setTimeout(() => setError(null), 3000);
       return;
     }
-  };
 
-  const whatsappMessage = `Hi, I want to order "${product.name}"${selectedSize ? ` (Size: ${selectedSize})` : ''} (Price: ₹${product.price}). Is it available?`;
-  const whatsappUrl = `https://wa.me/919605333248?text=${encodeURIComponent(whatsappMessage)}`;
+    const message = `
+🛒 *Vintage Vault Order*
+
+📦 Product: ${product.name}
+📏 Size: ${selectedSize}
+💰 Price: ₹${product.price}
+
+🖼️ Product Image:
+${product.images?.[0] || product.image}
+
+🔗 View Product:
+${window.location.href}
+
+❓ Is this available?
+`;
+
+    const whatsappUrl = `https://wa.me/919605333248?text=${encodeURIComponent(message.trim())}`;
+    window.open(whatsappUrl, "_blank");
+  };
 
   return (
     <div className="pt-32 pb-24 px-6 max-w-7xl mx-auto">
@@ -193,20 +208,19 @@ export default function ProductDetailPage() {
             )}
           </div>
 
-          <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" onClick={handleOrder}>
-            <motion.button 
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className={`w-full py-5 rounded-2xl flex items-center justify-center space-x-4 text-sm font-black uppercase tracking-[0.2em] shadow-2xl transition-all ${
-                selectedSize 
-                  ? 'bg-white text-black hover:bg-gold' 
-                  : 'bg-white/5 text-white/30 border border-white/5 cursor-not-allowed'
-              }`}
-            >
-              <Smartphone size={18} />
-              <span>Order via WhatsApp</span>
-            </motion.button>
-          </a>
+          <motion.button 
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={handleWhatsApp}
+            className={`w-full py-5 rounded-2xl flex items-center justify-center space-x-4 text-sm font-black uppercase tracking-[0.2em] shadow-2xl transition-all ${
+              selectedSize 
+                ? 'bg-white text-black hover:bg-gold' 
+                : 'bg-white/5 text-white/30 border border-white/5 cursor-not-allowed'
+            }`}
+          >
+            <Smartphone size={18} />
+            <span>Order via WhatsApp</span>
+          </motion.button>
 
           <div className="mt-8 flex items-center justify-center space-x-8 text-[9px] text-gray-600 uppercase tracking-widest font-bold">
             <span className="border-b border-gray-600/30 pb-1">All India Shipping</span>
