@@ -69,15 +69,14 @@ export default function ProductDetailPage() {
       return;
     }
 
-    const message = `
+    const imageUrl = product.images?.[0] || product.image;
+    const message = `${imageUrl}
+
 🛒 *Vintage Vault Order*
 
 📦 Product: ${product.name}
 📏 Size: ${selectedSize}
 💰 Price: ₹${product.price}
-
-🖼️ Product Image:
-${product.images?.[0] || product.image}
 
 🔗 View Product:
 ${window.location.href}
