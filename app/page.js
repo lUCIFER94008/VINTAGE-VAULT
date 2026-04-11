@@ -21,7 +21,7 @@ export default function Home() {
         {/* Background Image */}
         <div className="absolute inset-0 -z-10">
           <Image
-            src="/images/vintage-bg.jpg"
+            src="/images/vintage-bg.jpg.jpeg"
             alt="Vintage Vault Background"
             fill
             priority
