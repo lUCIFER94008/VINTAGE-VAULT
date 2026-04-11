@@ -18,17 +18,19 @@ export default function Home() {
     <div className="flex flex-col min-h-screen pt-14 md:pt-16">
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-start px-4 md:px-10 overflow-hidden">
-        {/* Background Image */}
+        {/* Background */}
         <div className="absolute inset-0 -z-10">
-          <Image
-            src="/images/vintage-bg.jpg.jpeg"
+          <img
+            src="https://res.cloudinary.com/dpmpefw2p/image/upload/v1775923076/vintage-bg.jpg_k2fdso.jpg"
             alt="Vintage Vault Background"
-            fill
-            priority
-            className="object-cover object-center"
+            className="w-full h-full object-cover object-center"
           />
-          {/* Dark overlay for readability */}
-          <div className="absolute inset-0 bg-black/60 shadow-[inset_0_0_100px_rgba(0,0,0,0.8)]"></div>
+
+          {/* Premium Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-black/10"></div>
+          
+          {/* Subtle bottom fade */}
+          <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black to-transparent"></div>
         </div>
 
         {/* Content */}
@@ -69,9 +71,6 @@ export default function Home() {
             </motion.div>
           </div>
         </div>
-        
-        {/* Bottom gradient fade */}
-        <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black to-transparent"></div>
       </section>
 
       {/* Features Strip (Compact) */}
