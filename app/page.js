@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ChevronRight, ArrowRight, Truck, RefreshCcw, Smartphone } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -15,44 +16,53 @@ const CATEGORIES = [
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen pt-14 md:pt-16">
-      {/* Hero Section (Compact) */}
-      <section className="relative min-h-[80vh] flex items-center overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-black/70 z-10" />
-          <img 
-            src="https://images.unsplash.com/photo-1558769132-cb1aea458c5e?auto=format&fit=crop&q=80&w=1600" 
-            className="w-full h-full object-cover"
-            alt="Hero Background"
+      {/* Hero Section */}
+      <section className="relative min-h-screen flex items-center justify-start px-4 md:px-10 overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0 -z-10">
+          <Image
+            src="/images/vintage-bg.jpg"
+            alt="Vintage Vault Background"
+            fill
+            priority
+            className="object-cover object-center"
           />
+          {/* Dark overlay for readability */}
+          <div className="absolute inset-0 bg-black/60 shadow-[inset_0_0_100px_rgba(0,0,0,0.8)]"></div>
         </div>
 
-        <div className="container mx-auto px-4 relative z-20 w-full">
-          <div className="max-w-4xl text-center lg:text-left mx-auto lg:mx-0">
+        {/* Content */}
+        <div className="container mx-auto relative z-10">
+          <div className="max-w-4xl">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="max-w-[90%] mx-auto lg:mx-0 break-words"
+              transition={{ duration: 1, ease: "easeOut" }}
             >
-              <h1 className="text-3xl md:text-5xl lg:text-7xl font-black tracking-tighter mb-3 leading-tight uppercase">
-                <span className="text-white">VINTAGE.</span>
-                <br className="md:hidden" />
-                <span className="text-gold lg:ml-3">VAULT</span>
+              <h1 className="text-5xl md:text-8xl font-black text-white tracking-tighter uppercase leading-[0.9]">
+                VINTAGE. <br />
+                <span className="text-gold">VAULT</span>
               </h1>
-              
-              <p className="text-xs md:text-lg text-gray-300 mb-8 tracking-[0.2em] uppercase font-light max-w-lg mx-auto lg:mx-0">
-                TIMELESS STYLE. <br className="md:hidden" /> SUSTAINABLE FASHION.
-              </p>
+
+              <motion.p 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5, duration: 1 }}
+                className="mt-6 text-gray-300 tracking-[0.3em] font-light text-xs md:text-lg uppercase max-w-lg"
+              >
+                TIMELESS STYLE. SUSTAINABLE FASHION.
+              </motion.p>
 
               <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
+                initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.3, duration: 0.5 }}
-                className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start"
+                transition={{ delay: 0.8, duration: 0.5 }}
+                className="mt-10"
               >
-                <Link href="/products" className="w-full sm:w-auto">
-                  <button className="w-full sm:w-auto bg-gold text-black px-8 py-3 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-white hover:scale-105 transition-all duration-300 shadow-lg">
-                    Shop Now <ChevronRight className="inline-block ml-1" size={14} />
+                <Link href="/products">
+                  <button className="bg-gold text-black px-8 md:px-10 py-3 md:py-4 rounded-full font-bold uppercase tracking-widest hover:bg-white hover:scale-105 transition-all duration-300 shadow-2xl flex items-center gap-2 group text-xs md:text-sm">
+                    SHOP NOW 
+                    <ArrowRight className="group-hover:translate-x-1 transition-transform" size={18} />
                   </button>
                 </Link>
               </motion.div>
@@ -60,7 +70,8 @@ export default function Home() {
           </div>
         </div>
         
-        <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-black to-transparent z-10" />
+        {/* Bottom gradient fade */}
+        <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black to-transparent"></div>
       </section>
 
       {/* Features Strip (Compact) */}
