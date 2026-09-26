@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
-  Truck,
   RotateCcw,
   ShieldCheck,
   Headphones,
@@ -173,19 +172,9 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* SECTION 2 - SERVICE FEATURES (WHITE CARDS) */}
+      {/* SECTION 2 - SERVICE FEATURES (WHITE CARDS - 3 COLUMNS) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          <div className="p-6 rounded-2xl bg-white border border-[#EAEAEA] shadow-sm flex items-start gap-4">
-            <div className="p-3 rounded-xl bg-[#F8F8F8] text-[#111111] shrink-0 border border-[#EAEAEA]">
-              <Truck className="w-6 h-6 text-zinc-900" />
-            </div>
-            <div>
-              <h4 className="text-sm font-bold text-[#111111] uppercase">FREE DELIVERY</h4>
-              <p className="text-xs text-[#666666] mt-1">On selected orders & drops</p>
-            </div>
-          </div>
-
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
           <div className="p-6 rounded-2xl bg-white border border-[#EAEAEA] shadow-sm flex items-start gap-4">
             <div className="p-3 rounded-xl bg-[#F8F8F8] text-[#111111] shrink-0 border border-[#EAEAEA]">
               <RotateCcw className="w-6 h-6 text-zinc-900" />
