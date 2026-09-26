@@ -29,8 +29,10 @@ export async function connectToDatabase() {
     };
 
     cached!.promise = mongoose.connect(MONGODB_URI, opts).then((mongooseInstance) => {
+      console.log('MongoDB connected successfully');
       return mongooseInstance;
     }).catch((err) => {
+      console.error('MongoDB connection error:', err);
       cached!.promise = null;
       throw err;
     });

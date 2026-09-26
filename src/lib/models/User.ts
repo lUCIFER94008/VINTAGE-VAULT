@@ -19,7 +19,9 @@ export interface IUserDocument extends Document {
   email: string;
   phone: string;
   password?: string;
-  role: 'customer' | 'admin';
+  role: 'user' | 'customer' | 'admin';
+  avatar?: string;
+  isActive?: boolean;
   addresses: IUserAddress[];
   createdAt: Date;
   updatedAt: Date;
@@ -47,7 +49,9 @@ const UserSchema = new Schema<IUserDocument>(
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     phone: { type: String, required: true, trim: true },
     password: { type: String, required: true },
-    role: { type: String, enum: ['customer', 'admin'], default: 'customer' },
+    role: { type: String, enum: ['user', 'customer', 'admin'], default: 'user' },
+    avatar: { type: String, default: '' },
+    isActive: { type: Boolean, default: true },
     addresses: [AddressSchema],
   },
   { timestamps: true }
