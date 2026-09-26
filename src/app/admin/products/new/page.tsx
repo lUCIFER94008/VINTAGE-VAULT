@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/context/ToastContext';
-import { ArrowLeft, Upload, X } from 'lucide-react';
+import { ArrowLeft, X } from 'lucide-react';
+import ProductImageUpload from '@/components/admin/ProductImageUpload';
 
 export default function AddProductPage() {
   const router = useRouter();
@@ -17,10 +18,7 @@ export default function AddProductPage() {
   const [stock, setStock] = useState('25');
   const [sizes, setSizes] = useState<string[]>(['S', 'M', 'L', 'XL']);
   const [colors, setColors] = useState<string[]>(['Black']);
-  const [images, setImages] = useState<string[]>([
-    'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=800&q=80',
-  ]);
-  const [newImageUrl, setNewImageUrl] = useState('');
+  const [images, setImages] = useState<string[]>([]);
   const [isFeatured, setIsFeatured] = useState(false);
   const [isNewArrival, setIsNewArrival] = useState(true);
   const [isActive, setIsActive] = useState(true);
@@ -59,70 +57,13 @@ export default function AddProductPage() {
     setColors(colors.filter((c) => c !== col));
   };
 
-  const handleAddImageUrl = () => {
-    if (newImageUrl.trim()) {
-      setImages([...images, newImageUrl.trim()]);
-      setNewImageUrl('');
-    }
-  };
-
-  const removeImage = (idx: number) => {
-    setImages(images.filter((_, i) => i !== idx));
-  };
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (file.size > 10 * 1024 * 1024) {
-      showToast('Image file is too large. Please select a file smaller than 10MB.', 'error');
-      return;
-    }
-
-    if (!file.type.startsWith('image/')) {
-      showToast('Unsupported image format. Please upload a JPG, PNG, WEBP, or AVIF file.', 'error');
-      return;
-    }
-
-    setUploadingImage(true);
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const contentType = res.headers.get('content-type');
-      let data: any = {};
-      if (contentType && contentType.includes('application/json')) {
-        data = await res.json();
-      } else {
-        const text = await res.text();
-        if (res.status === 413 || text.includes('Request Entity Too Large')) {
-          throw new Error('Image file is too large. Please choose a smaller file.');
-        }
-        throw new Error(text || `Upload failed with status ${res.status}`);
-      }
-
-      if (res.ok && data.success && data.url) {
-        setImages((prev) => [...prev, data.url]);
-        showToast('Image uploaded successfully to Cloudinary!', 'success');
-      } else {
-        showToast(data.message || 'Image upload failed.', 'error');
-      }
-    } catch (err: any) {
-      console.error('Image upload error:', err);
-      showToast(err?.message || 'Cloudinary image upload failed.', 'error');
-    } finally {
-      setUploadingImage(false);
-      e.target.value = '';
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (uploadingImage) {
+      showToast('Please wait for image uploads to complete.', 'error');
+      return;
+    }
 
     if (!name.trim()) {
       showToast('Product name is required.', 'error');
@@ -357,63 +298,12 @@ export default function AddProductPage() {
             </div>
 
             {/* Images Section */}
-            <div className="sm:col-span-2 space-y-3">
-              <label className="text-xs font-bold text-[#111111] uppercase tracking-wider block">
-                PRODUCT IMAGES (CLOUDINARY / URLS) *
-              </label>
-
-              {/* Cloudinary upload button */}
-              <div className="flex items-center gap-4">
-                <label className="bg-[#F8F8F8] border border-[#EAEAEA] hover:border-[#111111] text-[#111111] text-xs font-bold px-4 py-2.5 rounded-xl cursor-pointer flex items-center gap-2">
-                  <Upload className="w-4 h-4 text-[#111111]" />
-                  <span>{uploadingImage ? 'UPLOADING...' : 'UPLOAD IMAGE FILE'}</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileUpload}
-                    className="hidden"
-                  />
-                </label>
-
-                <span className="text-xs text-[#888888] font-mono">OR</span>
-
-                <div className="flex-1 flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="Paste image URL..."
-                    value={newImageUrl}
-                    onChange={(e) => setNewImageUrl(e.target.value)}
-                    className="flex-1 bg-white border border-[#EAEAEA] text-[#111111] text-xs rounded-xl px-4 py-2.5 focus:outline-none focus:border-[#111111]"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleAddImageUrl}
-                    className="bg-[#111111] text-white font-bold text-xs px-4 py-2.5 rounded-xl uppercase"
-                  >
-                    ADD URL
-                  </button>
-                </div>
-              </div>
-
-              {/* Image Previews Grid */}
-              <div className="flex flex-wrap gap-3 pt-2">
-                {images.map((img, idx) => (
-                  <div
-                    key={idx}
-                    className="relative w-24 h-28 rounded-xl overflow-hidden bg-[#F8F8F8] border border-[#EAEAEA] group"
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={img} alt={`Preview ${idx}`} className="w-full h-full object-cover" />
-                    <button
-                      type="button"
-                      onClick={() => removeImage(idx)}
-                      className="absolute top-1 right-1 bg-[#111111]/80 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                ))}
-              </div>
+            <div className="sm:col-span-2">
+              <ProductImageUpload
+                images={images}
+                setImages={setImages}
+                onUploadingChange={setUploadingImage}
+              />
             </div>
 
             {/* Checkboxes */}
@@ -452,10 +342,14 @@ export default function AddProductPage() {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || uploadingImage}
             className="w-full bg-[#111111] hover:bg-zinc-800 text-white font-black text-xs py-4 rounded-2xl uppercase tracking-wider transition-all shadow-md disabled:opacity-50"
           >
-            {loading ? 'SAVING PRODUCT TO MONGODB...' : 'SAVE PRODUCT'}
+            {uploadingImage
+              ? 'Uploading images...'
+              : loading
+              ? 'SAVING PRODUCT TO MONGODB...'
+              : 'SAVE PRODUCT'}
           </button>
         </form>
       </div>

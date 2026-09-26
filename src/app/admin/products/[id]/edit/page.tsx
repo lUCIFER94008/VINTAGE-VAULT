@@ -5,8 +5,9 @@ export const dynamic = 'force-dynamic';
 import React, { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/context/ToastContext';
-import { ArrowLeft, Upload, X } from 'lucide-react';
+import { ArrowLeft, X } from 'lucide-react';
 import { Product } from '@/types';
+import ProductImageUpload from '@/components/admin/ProductImageUpload';
 
 export default function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -23,7 +24,6 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   const [sizes, setSizes] = useState<string[]>([]);
   const [colors, setColors] = useState<string[]>([]);
   const [images, setImages] = useState<string[]>([]);
-  const [newImageUrl, setNewImageUrl] = useState('');
   const [isFeatured, setIsFeatured] = useState(false);
   const [isNewArrival, setIsNewArrival] = useState(false);
   const [isActive, setIsActive] = useState(true);
@@ -93,50 +93,23 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     setColors(colors.filter((c) => c !== col));
   };
 
-  const handleAddImageUrl = () => {
-    if (newImageUrl.trim()) {
-      setImages([...images, newImageUrl.trim()]);
-      setNewImageUrl('');
-    }
-  };
-
-  const removeImage = (idx: number) => {
-    setImages(images.filter((_, i) => i !== idx));
-  };
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setUploadingImage(true);
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      try {
-        const res = await fetch('/api/upload', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ image: reader.result }),
-        });
-        const data = await res.json();
-        if (data.success && data.url) {
-          setImages((prev) => [...prev, data.url]);
-          showToast('Image uploaded successfully!', 'success');
-        } else {
-          showToast('Image upload failed.', 'error');
-        }
-      } catch (err) {
-        showToast('Error uploading file.', 'error');
-      } finally {
-        setUploadingImage(false);
-      }
-    };
-    reader.readAsDataURL(file);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (uploadingImage) {
+      showToast('Please wait for image uploads to complete.', 'error');
+      return;
+    }
+
     if (!name || !price || images.length === 0) {
       showToast('Product name, price, and at least one image are required.', 'error');
+      return;
+    }
+
+    // Ensure no base64 strings accidentally slip in
+    const hasBase64 = images.some(img => img.startsWith('data:image/'));
+    if (hasBase64) {
+      showToast('Base64 image data is not allowed. Please upload via Cloudinary or use image URLs.', 'error');
       return;
     }
 
@@ -335,53 +308,12 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
             </div>
 
             {/* Images */}
-            <div className="sm:col-span-2 space-y-3">
-              <label className="text-xs font-bold text-[#111111] uppercase tracking-wider block">
-                IMAGES
-              </label>
-              <div className="flex items-center gap-4">
-                <label className="bg-[#F8F8F8] border border-[#EAEAEA] text-[#111111] text-xs font-bold px-4 py-2.5 rounded-xl cursor-pointer flex items-center gap-2">
-                  <Upload className="w-4 h-4 text-[#111111]" />
-                  <span>{uploadingImage ? 'UPLOADING...' : 'UPLOAD NEW FILE'}</span>
-                  <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
-                </label>
-
-                <div className="flex-1 flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="Paste image URL..."
-                    value={newImageUrl}
-                    onChange={(e) => setNewImageUrl(e.target.value)}
-                    className="flex-1 bg-white border border-[#EAEAEA] text-[#111111] text-xs rounded-xl px-4 py-2.5 focus:outline-none focus:border-[#111111]"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleAddImageUrl}
-                    className="bg-[#111111] text-white font-bold text-xs px-4 py-2.5 rounded-xl uppercase"
-                  >
-                    ADD URL
-                  </button>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap gap-3 pt-2">
-                {images.map((img, idx) => (
-                  <div
-                    key={idx}
-                    className="relative w-24 h-28 rounded-xl overflow-hidden bg-[#F8F8F8] border border-[#EAEAEA] group"
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={img} alt={`Preview ${idx}`} className="w-full h-full object-cover" />
-                    <button
-                      type="button"
-                      onClick={() => removeImage(idx)}
-                      className="absolute top-1 right-1 bg-[#111111]/80 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                ))}
-              </div>
+            <div className="sm:col-span-2">
+              <ProductImageUpload
+                images={images}
+                setImages={setImages}
+                onUploadingChange={setUploadingImage}
+              />
             </div>
 
             {/* Flags */}
@@ -420,10 +352,14 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
 
           <button
             type="submit"
-            disabled={saving}
+            disabled={saving || uploadingImage}
             className="w-full bg-[#111111] hover:bg-zinc-800 text-white font-black text-xs py-4 rounded-2xl uppercase tracking-wider transition-all shadow-md disabled:opacity-50"
           >
-            {saving ? 'SAVING CHANGES...' : 'SAVE CHANGES'}
+            {uploadingImage
+              ? 'Uploading images...'
+              : saving
+              ? 'SAVING CHANGES...'
+              : 'SAVE CHANGES'}
           </button>
         </form>
       </div>
