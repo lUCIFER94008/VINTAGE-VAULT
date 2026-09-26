@@ -296,42 +296,6 @@ export default function HomePage() {
         {loading ? <GridSkeleton count={4} /> : <ProductGrid products={newArrivals} />}
       </section>
 
-      {/* SECTION 6 - OFFER BANNER (WHITE/LIGHT THEME) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative rounded-3xl overflow-hidden bg-[#F8F8F8] border border-[#EAEAEA] p-8 sm:p-16 flex flex-col items-start justify-center min-h-[400px]">
-          <Image
-            src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1600&q=80"
-            alt="Vintage Vault Special Offer"
-            fill
-            className="object-cover object-center opacity-25"
-            unoptimized
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-transparent" />
-
-          <div className="relative z-10 max-w-xl space-y-4">
-            <span className="bg-[#111111] text-white text-xs font-black tracking-widest uppercase px-3 py-1.5 rounded-full inline-block">
-              LIMITED TIME OFFER
-            </span>
-            <h2 className="text-4xl sm:text-6xl font-black tracking-tighter uppercase text-[#111111] leading-none">
-              NEW COLLECTION<br />
-              <span className="text-amber-600">UP TO 50% OFF</span>
-            </h2>
-            <p className="text-[#666666] text-sm font-medium">
-              Upgrade your rotation with heavyweight boxy jerseys, relaxed cargo jeans and limited eyewear.
-            </p>
-            <div className="pt-2">
-              <Link
-                href="/products"
-                className="bg-[#111111] text-white font-black text-xs px-8 py-4 rounded-xl hover:bg-zinc-800 transition-colors uppercase tracking-wider inline-flex items-center gap-2 shadow-md"
-              >
-                <span>SHOP NOW</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* SECTION 7 - BEST SELLERS */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-[#EAEAEA] pb-4">
