@@ -74,41 +74,51 @@ export default function AddProductPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    if (file.size > 10 * 1024 * 1024) {
+      showToast('Image file is too large. Please select a file smaller than 10MB.', 'error');
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      showToast('Unsupported image format. Please upload a JPG, PNG, WEBP, or AVIF file.', 'error');
+      return;
+    }
+
     setUploadingImage(true);
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      try {
-        const res = await fetch('/api/upload', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ image: reader.result }),
-        });
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
 
-        const contentType = res.headers.get('content-type');
-        let data: any = {};
-        if (contentType && contentType.includes('application/json')) {
-          data = await res.json();
-        } else {
-          const text = await res.text();
-          if (res.status === 413 || text.includes('Request Entity Too Large')) {
-            throw new Error('Image file is too large for server payload. Please choose a smaller image or use image URL.');
-          }
-          throw new Error(text || `Upload failed with status ${res.status}`);
-        }
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
 
-        if (res.ok && data.success && data.url && (data.url.startsWith('http://') || data.url.startsWith('https://'))) {
-          setImages((prev) => [...prev, data.url]);
-          showToast('Image uploaded successfully to Cloudinary!', 'success');
-        } else {
-          showToast(data.message || 'Image upload failed. Please use an HTTP/HTTPS image URL.', 'error');
+      const contentType = res.headers.get('content-type');
+      let data: any = {};
+      if (contentType && contentType.includes('application/json')) {
+        data = await res.json();
+      } else {
+        const text = await res.text();
+        if (res.status === 413 || text.includes('Request Entity Too Large')) {
+          throw new Error('Image file is too large. Please choose a smaller file.');
         }
-      } catch (err: any) {
-        showToast(err?.message || 'Error uploading file.', 'error');
-      } finally {
-        setUploadingImage(false);
+        throw new Error(text || `Upload failed with status ${res.status}`);
       }
-    };
-    reader.readAsDataURL(file);
+
+      if (res.ok && data.success && data.url) {
+        setImages((prev) => [...prev, data.url]);
+        showToast('Image uploaded successfully to Cloudinary!', 'success');
+      } else {
+        showToast(data.message || 'Image upload failed.', 'error');
+      }
+    } catch (err: any) {
+      console.error('Image upload error:', err);
+      showToast(err?.message || 'Cloudinary image upload failed.', 'error');
+    } finally {
+      setUploadingImage(false);
+      e.target.value = '';
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
