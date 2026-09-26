@@ -2,20 +2,62 @@
 
 export const dynamic = 'force-dynamic';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
+import { useToast } from '@/context/ToastContext';
 import { formatCurrency } from '@/lib/whatsapp';
 import { Trash2, ArrowRight, ShoppingBag, ShieldCheck, Truck } from 'lucide-react';
 
 export default function CartPage() {
   const router = useRouter();
   const { items, removeFromCart, updateQuantity, subtotal, itemCount } = useCart();
+  const { showToast } = useToast();
+  const [checkingAuth, setCheckingAuth] = useState(false);
 
-  const shipping = 0; // FREE Shipping
-  const total = subtotal + shipping;
+  const total = subtotal;
+
+  const handleProceedToAddress = async () => {
+    if (items.length === 0) {
+      showToast('Your cart is empty.', 'error');
+      return;
+    }
+
+    setCheckingAuth(true);
+    try {
+      const res = await fetch('/api/auth/me', {
+        method: 'GET',
+        cache: 'no-store',
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.user) {
+          router.push('/address');
+          return;
+        }
+      }
+
+      if (res.status === 401) {
+        router.push('/login?redirect=/address');
+        return;
+      }
+
+      const data = await res.json().catch(() => ({}));
+      if (data.user) {
+        router.push('/address');
+      } else {
+        router.push('/login?redirect=/address');
+      }
+    } catch (err) {
+      console.error('Auth check error:', err);
+      showToast('Unable to verify your login. Please try again.', 'error');
+    } finally {
+      setCheckingAuth(false);
+    }
+  };
 
   if (items.length === 0) {
     return (
@@ -156,12 +198,6 @@ export default function CartPage() {
                 <span>Subtotal</span>
                 <span className="font-bold text-[#111111]">{formatCurrency(subtotal)}</span>
               </div>
-              <div className="flex justify-between items-center">
-                <span>Estimated Delivery</span>
-                <span className="text-xs font-bold text-[#25D366] bg-[#25D366]/10 border border-[#25D366]/30 px-2.5 py-1 rounded-full uppercase">
-                  FREE
-                </span>
-              </div>
               <div className="pt-3 border-t border-[#EAEAEA] flex justify-between items-center text-base font-black text-[#111111]">
                 <span>TOTAL</span>
                 <span className="text-xl text-[#111111]">{formatCurrency(total)}</span>
@@ -169,10 +205,11 @@ export default function CartPage() {
             </div>
 
             <button
-              onClick={() => router.push('/address')}
-              className="w-full bg-[#111111] hover:bg-zinc-800 text-white font-black text-xs py-4 rounded-2xl uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-md"
+              onClick={handleProceedToAddress}
+              disabled={checkingAuth}
+              className="w-full bg-[#111111] hover:bg-zinc-800 text-white font-black text-xs py-4 rounded-2xl uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-md disabled:opacity-50"
             >
-              <span>PROCEED TO ADDRESS</span>
+              <span>{checkingAuth ? 'CHECKING...' : 'PROCEED TO ADDRESS'}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
 

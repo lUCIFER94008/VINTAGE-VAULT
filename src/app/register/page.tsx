@@ -1,14 +1,16 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
 import { ArrowRight, User, Mail, Phone, Lock } from 'lucide-react';
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get('redirect');
   const { register } = useAuth();
   const { showToast } = useToast();
 
@@ -47,135 +49,150 @@ export default function RegisterPage() {
 
     if (res.success) {
       showToast('Account created successfully! Welcome to VINTAGE VAULT.', 'success');
-      router.push('/account');
+      if (redirect) {
+        router.push(redirect);
+      } else {
+        router.push('/account');
+      }
     } else {
       showToast(res.message || 'Registration failed.', 'error');
     }
   };
 
   return (
-    <div className="bg-white min-h-screen flex items-center justify-center">
-      <div className="w-full max-w-md mx-auto px-4 py-16 space-y-8">
-        <div className="text-center space-y-2">
-          <span className="text-xs font-bold tracking-widest text-[#888888] uppercase">
-            JOIN THE VAULT
-          </span>
-          <h1 className="text-3xl font-black text-[#111111] uppercase tracking-tight">
-            CREATE AN ACCOUNT
-          </h1>
-          <p className="text-xs text-[#666666]">
-            Sign up to track orders, save wishlists, and receive drop alerts.
-          </p>
+    <div className="w-full max-w-md mx-auto px-4 py-16 space-y-8">
+      <div className="text-center space-y-2">
+        <span className="text-xs font-bold tracking-widest text-[#888888] uppercase">
+          JOIN THE VAULT
+        </span>
+        <h1 className="text-3xl font-black text-[#111111] uppercase tracking-tight">
+          CREATE AN ACCOUNT
+        </h1>
+        <p className="text-xs text-[#666666]">
+          Sign up to track orders, save wishlists, and receive drop alerts.
+        </p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="p-8 rounded-3xl bg-white border border-[#EAEAEA] shadow-sm space-y-4">
+        {/* Full Name */}
+        <div className="space-y-1">
+          <label className="text-xs font-bold text-[#111111] uppercase tracking-wider block">
+            FULL NAME
+          </label>
+          <div className="relative flex items-center">
+            <input
+              type="text"
+              placeholder="e.g. Mohammed Rizwan"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full bg-white border border-[#EAEAEA] text-[#111111] text-sm rounded-xl px-4 py-3 pl-11 focus:outline-none focus:border-[#111111]"
+              required
+            />
+            <User className="w-4 h-4 text-[#888888] absolute left-4" />
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-8 rounded-3xl bg-white border border-[#EAEAEA] shadow-sm space-y-4">
-          {/* Full Name */}
-          <div className="space-y-1">
-            <label className="text-xs font-bold text-[#111111] uppercase tracking-wider block">
-              FULL NAME
-            </label>
-            <div className="relative flex items-center">
-              <input
-                type="text"
-                placeholder="e.g. Mohammed Rizwan"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full bg-white border border-[#EAEAEA] text-[#111111] text-sm rounded-xl px-4 py-3 pl-11 focus:outline-none focus:border-[#111111]"
-                required
-              />
-              <User className="w-4 h-4 text-[#888888] absolute left-4" />
-            </div>
+        {/* Email */}
+        <div className="space-y-1">
+          <label className="text-xs font-bold text-[#111111] uppercase tracking-wider block">
+            EMAIL ADDRESS
+          </label>
+          <div className="relative flex items-center">
+            <input
+              type="email"
+              placeholder="rizwan@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full bg-white border border-[#EAEAEA] text-[#111111] text-sm rounded-xl px-4 py-3 pl-11 focus:outline-none focus:border-[#111111]"
+              required
+            />
+            <Mail className="w-4 h-4 text-[#888888] absolute left-4" />
           </div>
+        </div>
 
-          {/* Email */}
-          <div className="space-y-1">
-            <label className="text-xs font-bold text-[#111111] uppercase tracking-wider block">
-              EMAIL ADDRESS
-            </label>
-            <div className="relative flex items-center">
-              <input
-                type="email"
-                placeholder="rizwan@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-white border border-[#EAEAEA] text-[#111111] text-sm rounded-xl px-4 py-3 pl-11 focus:outline-none focus:border-[#111111]"
-                required
-              />
-              <Mail className="w-4 h-4 text-[#888888] absolute left-4" />
-            </div>
+        {/* Phone */}
+        <div className="space-y-1">
+          <label className="text-xs font-bold text-[#111111] uppercase tracking-wider block">
+            INDIAN PHONE NUMBER
+          </label>
+          <div className="relative flex items-center">
+            <input
+              type="tel"
+              placeholder="9876543210"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="w-full bg-white border border-[#EAEAEA] text-[#111111] text-sm rounded-xl px-4 py-3 pl-11 focus:outline-none focus:border-[#111111]"
+              required
+            />
+            <Phone className="w-4 h-4 text-[#888888] absolute left-4" />
           </div>
+        </div>
 
-          {/* Phone */}
-          <div className="space-y-1">
-            <label className="text-xs font-bold text-[#111111] uppercase tracking-wider block">
-              INDIAN PHONE NUMBER
-            </label>
-            <div className="relative flex items-center">
-              <input
-                type="tel"
-                placeholder="9876543210"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="w-full bg-white border border-[#EAEAEA] text-[#111111] text-sm rounded-xl px-4 py-3 pl-11 focus:outline-none focus:border-[#111111]"
-                required
-              />
-              <Phone className="w-4 h-4 text-[#888888] absolute left-4" />
-            </div>
+        {/* Password */}
+        <div className="space-y-1">
+          <label className="text-xs font-bold text-[#111111] uppercase tracking-wider block">
+            PASSWORD
+          </label>
+          <div className="relative flex items-center">
+            <input
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full bg-white border border-[#EAEAEA] text-[#111111] text-sm rounded-xl px-4 py-3 pl-11 focus:outline-none focus:border-[#111111]"
+              required
+            />
+            <Lock className="w-4 h-4 text-[#888888] absolute left-4" />
           </div>
+        </div>
 
-          {/* Password */}
-          <div className="space-y-1">
-            <label className="text-xs font-bold text-[#111111] uppercase tracking-wider block">
-              PASSWORD
-            </label>
-            <div className="relative flex items-center">
-              <input
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-white border border-[#EAEAEA] text-[#111111] text-sm rounded-xl px-4 py-3 pl-11 focus:outline-none focus:border-[#111111]"
-                required
-              />
-              <Lock className="w-4 h-4 text-[#888888] absolute left-4" />
-            </div>
+        {/* Confirm Password */}
+        <div className="space-y-1">
+          <label className="text-xs font-bold text-[#111111] uppercase tracking-wider block">
+            CONFIRM PASSWORD
+          </label>
+          <div className="relative flex items-center">
+            <input
+              type="password"
+              placeholder="••••••••"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="w-full bg-white border border-[#EAEAEA] text-[#111111] text-sm rounded-xl px-4 py-3 pl-11 focus:outline-none focus:border-[#111111]"
+              required
+            />
+            <Lock className="w-4 h-4 text-[#888888] absolute left-4" />
           </div>
+        </div>
 
-          {/* Confirm Password */}
-          <div className="space-y-1">
-            <label className="text-xs font-bold text-[#111111] uppercase tracking-wider block">
-              CONFIRM PASSWORD
-            </label>
-            <div className="relative flex items-center">
-              <input
-                type="password"
-                placeholder="••••••••"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full bg-white border border-[#EAEAEA] text-[#111111] text-sm rounded-xl px-4 py-3 pl-11 focus:outline-none focus:border-[#111111]"
-                required
-              />
-              <Lock className="w-4 h-4 text-[#888888] absolute left-4" />
-            </div>
-          </div>
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-[#111111] hover:bg-zinc-800 text-white font-black text-xs py-4 rounded-xl uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-md disabled:opacity-50 pt-3"
+        >
+          <span>{loading ? 'CREATING ACCOUNT...' : 'REGISTER'}</span>
+          <ArrowRight className="w-4 h-4" />
+        </button>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-[#111111] hover:bg-zinc-800 text-white font-black text-xs py-4 rounded-xl uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-md disabled:opacity-50 pt-3"
+        <div className="pt-3 border-t border-[#EAEAEA] text-center text-xs text-[#666666]">
+          Already have an account?{' '}
+          <Link
+            href={redirect ? `/login?redirect=${encodeURIComponent(redirect)}` : '/login'}
+            className="text-[#111111] font-bold underline"
           >
-            <span>{loading ? 'CREATING ACCOUNT...' : 'REGISTER'}</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
+            Login Here
+          </Link>
+        </div>
+      </form>
+    </div>
+  );
+}
 
-          <div className="pt-3 border-t border-[#EAEAEA] text-center text-xs text-[#666666]">
-            Already have an account?{' '}
-            <Link href="/login" className="text-[#111111] font-bold underline">
-              Login Here
-            </Link>
-          </div>
-        </form>
-      </div>
+export default function RegisterPage() {
+  return (
+    <div className="bg-white min-h-screen flex items-center justify-center">
+      <Suspense fallback={<div className="text-center p-8 text-xs text-[#666666]">Loading...</div>}>
+        <RegisterForm />
+      </Suspense>
     </div>
   );
 }
