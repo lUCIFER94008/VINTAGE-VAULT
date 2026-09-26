@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import { Category } from '@/lib/models/Category';
+import { Product } from '@/lib/models/Product';
 import { requireAdmin } from '@/lib/auth';
 
 export async function PUT(
@@ -56,6 +57,29 @@ export async function DELETE(
 
     const { id } = await params;
     await connectToDatabase();
+
+    const categoryDoc = await Category.findById(id);
+    if (!categoryDoc) {
+      return NextResponse.json(
+        { success: false, message: 'Category not found.' },
+        { status: 404 }
+      );
+    }
+
+    const productCount = await Product.countDocuments({
+      category: categoryDoc.slug,
+      isActive: true,
+    });
+
+    if (productCount > 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: `Cannot delete category "${categoryDoc.name}" because ${productCount} active product(s) are using it. Please reassign or delete those products first.`,
+        },
+        { status: 400 }
+      );
+    }
 
     await Category.findByIdAndUpdate(id, { isActive: false });
 

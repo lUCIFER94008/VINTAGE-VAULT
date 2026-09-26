@@ -51,7 +51,8 @@ export async function POST(req: NextRequest) {
       const bytes = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
 
-      imageUrl = await uploadBufferToCloudinary(buffer, 'vintage-vault/products');
+      const targetFolder = (formData.get('folder') as string) || 'vintage-vault/products';
+      imageUrl = await uploadBufferToCloudinary(buffer, targetFolder);
     } else if (contentType.includes('application/json')) {
       const body = await req.json().catch(() => ({}));
       const { image } = body;
