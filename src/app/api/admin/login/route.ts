@@ -8,12 +8,16 @@ export async function POST(req: NextRequest) {
     const adminEmail = process.env.ADMIN_EMAIL;
     const adminPassword = process.env.ADMIN_PASSWORD;
 
+    // Safe dev/runtime logging (never log values or passwords)
+    console.log('ADMIN_EMAIL configured:', !!adminEmail);
+    console.log('ADMIN_PASSWORD configured:', !!adminPassword);
+
     // 1. Verify required environment variables exist
     if (!adminEmail || !adminPassword) {
       return NextResponse.json(
         {
           success: false,
-          message: 'Admin authentication is not configured. Please configure the required server environment variables.',
+          message: 'Admin authentication is not configured',
         },
         { status: 500 }
       );

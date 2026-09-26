@@ -1,14 +1,27 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import { Category } from '@/lib/models/Category';
 import { Product } from '@/lib/models/Product';
 import { User } from '@/lib/models/User';
 import { Order } from '@/lib/models/Order';
-import { hashPassword } from '@/lib/auth';
+import { hashPassword, requireAdmin } from '@/lib/auth';
 import { INITIAL_CATEGORIES, INITIAL_PRODUCTS } from '@/lib/seedData';
 
 export async function GET() {
+  return NextResponse.json(
+    {
+      success: false,
+      message: 'Unrestricted GET seed is disabled for security. Please use authenticated POST /api/seed as an admin.',
+    },
+    { status: 405 }
+  );
+}
+
+export async function POST(req: NextRequest) {
   try {
+    const { errorResponse } = requireAdmin(req);
+    if (errorResponse) return errorResponse;
+
     await connectToDatabase();
 
     let createdCategoriesCount = 0;
