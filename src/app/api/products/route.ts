@@ -149,6 +149,28 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const hasBase64Image = images.some((img: any) => String(img).trim().startsWith('data:image/'));
+    if (hasBase64Image) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Base64 image data is not allowed in product payload. Please upload image files to Cloudinary or provide HTTP image URLs.',
+        },
+        { status: 400 }
+      );
+    }
+
+    const invalidUrl = images.some((img: any) => !String(img).trim().startsWith('http://') && !String(img).trim().startsWith('https://'));
+    if (invalidUrl) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'All product images must be valid HTTP or HTTPS URLs.',
+        },
+        { status: 400 }
+      );
+    }
+
     await connectToDatabase();
 
     const trimmedName = name.trim();

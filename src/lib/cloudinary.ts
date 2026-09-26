@@ -8,21 +8,30 @@ cloudinary.config({
 });
 
 export async function uploadImageToCloudinary(fileString: string): Promise<string> {
-  // If Cloudinary isn't configured, fallback gracefully to data URL or demo host
-  if (!process.env.CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_CLOUD_NAME === 'demo_cloud') {
-    // Return data URL or placeholder directly if provided
-    return fileString;
+  const trimmed = fileString.trim();
+
+  // If it's already an HTTP/HTTPS URL, return it directly
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return trimmed;
+  }
+
+  // Check if Cloudinary is configured
+  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+  const apiKey = process.env.CLOUDINARY_API_KEY;
+  const apiSecret = process.env.CLOUDINARY_API_SECRET;
+
+  if (!cloudName || !apiKey || !apiSecret || cloudName === 'demo_cloud') {
+    throw new Error('Cloudinary environment variables (CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET) are missing or invalid.');
   }
 
   try {
-    const uploadResponse = await cloudinary.uploader.upload(fileString, {
+    const uploadResponse = await cloudinary.uploader.upload(trimmed, {
       folder: 'vintagevault/products',
     });
     return uploadResponse.secure_url;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Cloudinary upload error:', error);
-    // Fallback to original string if upload fails
-    return fileString;
+    throw new Error(error.message || 'Failed to upload image file to Cloudinary.');
   }
 }
 

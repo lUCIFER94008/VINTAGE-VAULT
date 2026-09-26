@@ -83,15 +83,27 @@ export default function AddProductPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ image: reader.result }),
         });
-        const data = await res.json();
-        if (data.success && data.url) {
-          setImages((prev) => [...prev, data.url]);
-          showToast('Image uploaded successfully!', 'success');
+
+        const contentType = res.headers.get('content-type');
+        let data: any = {};
+        if (contentType && contentType.includes('application/json')) {
+          data = await res.json();
         } else {
-          showToast('Image upload failed.', 'error');
+          const text = await res.text();
+          if (res.status === 413 || text.includes('Request Entity Too Large')) {
+            throw new Error('Image file is too large for server payload. Please choose a smaller image or use image URL.');
+          }
+          throw new Error(text || `Upload failed with status ${res.status}`);
         }
-      } catch (err) {
-        showToast('Error uploading file.', 'error');
+
+        if (res.ok && data.success && data.url && (data.url.startsWith('http://') || data.url.startsWith('https://'))) {
+          setImages((prev) => [...prev, data.url]);
+          showToast('Image uploaded successfully to Cloudinary!', 'success');
+        } else {
+          showToast(data.message || 'Image upload failed. Please use an HTTP/HTTPS image URL.', 'error');
+        }
+      } catch (err: any) {
+        showToast(err?.message || 'Error uploading file.', 'error');
       } finally {
         setUploadingImage(false);
       }
@@ -114,6 +126,13 @@ export default function AddProductPage() {
 
     if (images.length === 0) {
       showToast('At least one product image is required.', 'error');
+      return;
+    }
+
+    // Ensure no base64 strings accidentally slip in
+    const hasBase64 = images.some(img => img.startsWith('data:image/'));
+    if (hasBase64) {
+      showToast('Base64 image data is not allowed. Please upload via Cloudinary or use image URLs.', 'error');
       return;
     }
 
@@ -141,7 +160,18 @@ export default function AddProductPage() {
         }),
       });
 
-      const data = await res.json();
+      const contentType = res.headers.get('content-type');
+      let data: any = {};
+      if (contentType && contentType.includes('application/json')) {
+        data = await res.json();
+      } else {
+        const text = await res.text();
+        if (res.status === 413 || text.includes('Request Entity Too Large')) {
+          throw new Error('Product request is too large. Please upload smaller images or use image URLs.');
+        }
+        throw new Error(text || `Request failed with status ${res.status}`);
+      }
+
       if (res.ok && data.success) {
         showToast('PRODUCT CREATED SUCCESSFULLY', 'success');
         router.push('/admin/products');
