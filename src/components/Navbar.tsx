@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Search, ShoppingBag, Heart, User, Menu, X, Tag, ShieldAlert } from 'lucide-react';
+import { Search, ShoppingBag, Heart, User, Menu, X, ShieldAlert } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { useAuth } from '@/context/AuthContext';
@@ -44,12 +44,6 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Top Banner */}
-      <div className="bg-[#F8F8F8] text-[#111111] text-xs py-2 px-4 text-center font-bold tracking-wider uppercase border-b border-[#EAEAEA] flex justify-center items-center gap-2">
-        <Tag className="w-3.5 h-3.5 text-[#111111]" />
-        <span>FLAT 50% OFF ON NEW ARRIVALS | FREE SHIPPING ALL OVER INDIA</span>
-      </div>
-
       {/* Main Sticky White Navbar */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#EAEAEA] text-[#111111] shadow-sm transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

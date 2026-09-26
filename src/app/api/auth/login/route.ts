@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import { User } from '@/lib/models/User';
-import { comparePassword, signToken } from '@/lib/auth';
+import { comparePassword, hashPassword, signToken } from '@/lib/auth';
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,22 +16,52 @@ export async function POST(req: NextRequest) {
 
     await connectToDatabase();
 
-    // Check if user exists by email or phone
-    const user = await User.findOne({
-      $or: [{ email: email.toLowerCase() }, { phone: email }],
+    const normalizedEmail = String(email).toLowerCase().trim();
+    const envAdminEmail = (process.env.ADMIN_EMAIL || 'admin@vintagevault.com').toLowerCase().trim();
+    const envAdminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+
+    // 1. Check if user exists by email or phone
+    let user = await User.findOne({
+      $or: [{ email: normalizedEmail }, { phone: email.trim() }],
     });
+
+    // Auto-create/sync admin user if logging in as admin email and user doesn't exist yet
+    if (normalizedEmail === envAdminEmail) {
+      if (!user) {
+        const hashedPassword = await hashPassword(envAdminPassword);
+        user = await User.create({
+          name: 'VINTAGE VAULT Admin',
+          email: envAdminEmail,
+          phone: '9876543210',
+          password: hashedPassword,
+          role: 'admin',
+          isActive: true,
+        });
+      }
+    }
 
     if (!user) {
       return NextResponse.json(
-        { success: false, message: 'Invalid credentials. User not found.' },
+        { success: false, message: 'Invalid credentials. Incorrect email or password.' },
         { status: 401 }
       );
     }
 
-    const isMatch = await comparePassword(password, user.password);
+    // Compare password
+    let isMatch = await comparePassword(password, user.password);
+
+    // If password didn't match hash, but matches process.env.ADMIN_PASSWORD for admin user, update DB hash
+    if (!isMatch && user.role === 'admin' && (normalizedEmail === envAdminEmail || user.email === envAdminEmail)) {
+      if (password === envAdminPassword) {
+        isMatch = true;
+        user.password = await hashPassword(envAdminPassword);
+        await user.save();
+      }
+    }
+
     if (!isMatch) {
       return NextResponse.json(
-        { success: false, message: 'Invalid credentials. Password incorrect.' },
+        { success: false, message: 'Invalid credentials. Incorrect email or password.' },
         { status: 401 }
       );
     }
@@ -54,7 +84,7 @@ export async function POST(req: NextRequest) {
         email: user.email,
         phone: user.phone,
         role: user.role,
-        addresses: user.addresses,
+        addresses: user.addresses || [],
       },
       token,
     });

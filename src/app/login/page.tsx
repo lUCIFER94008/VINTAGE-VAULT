@@ -94,12 +94,9 @@ export default function LoginPage() {
             <ArrowRight className="w-4 h-4" />
           </button>
 
-          <div className="pt-4 border-t border-[#EAEAEA] flex items-center justify-between text-xs text-[#666666]">
+          <div className="pt-4 border-t border-[#EAEAEA] text-center text-xs text-[#666666]">
             <Link href="/register" className="hover:text-[#111111] font-semibold underline">
               Create an Account
-            </Link>
-            <Link href="/admin/login" className="text-[#888888] hover:text-[#111111] font-mono">
-              Admin Login
             </Link>
           </div>
         </form>

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
-import { ShieldCheck, Lock, Mail, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Lock, Mail, ArrowRight, AlertCircle } from 'lucide-react';
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -14,23 +14,50 @@ export default function AdminLoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) {
-      showToast('Please enter admin credentials.', 'error');
+    setErrorMessage('');
+
+    if (!email.trim()) {
+      const msg = 'ADMIN EMAIL IS REQUIRED';
+      setErrorMessage(msg);
+      showToast(msg, 'error');
+      return;
+    }
+
+    if (!password.trim()) {
+      const msg = 'ADMIN PASSWORD IS REQUIRED';
+      setErrorMessage(msg);
+      showToast(msg, 'error');
       return;
     }
 
     setLoading(true);
-    const res = await login(email, password);
+    const res = await login(email.trim(), password);
     setLoading(false);
 
     if (res.success) {
-      showToast('Authenticated as Admin!', 'success');
-      router.push('/admin/dashboard');
+      // Double check role after login
+      try {
+        const meRes = await fetch('/api/auth/me');
+        const meData = await meRes.json();
+        if (meData.success && meData.user && meData.user.role === 'admin') {
+          showToast('Authenticated as Admin!', 'success');
+          router.push('/admin/dashboard');
+          return;
+        }
+      } catch (err) {
+        // Fallback
+      }
+      const err = 'INVALID ADMIN CREDENTIALS: Incorrect admin email or password.';
+      setErrorMessage(err);
+      showToast('Incorrect admin email or password.', 'error');
     } else {
-      showToast(res.message || 'Admin authentication failed.', 'error');
+      const err = 'INVALID ADMIN CREDENTIALS: Incorrect admin email or password.';
+      setErrorMessage(err);
+      showToast('Incorrect admin email or password.', 'error');
     }
   };
 
@@ -53,6 +80,13 @@ export default function AdminLoginPage() {
         </div>
 
         <form onSubmit={handleAdminLogin} className="p-8 rounded-3xl bg-white border border-[#EAEAEA] shadow-sm space-y-5">
+          {errorMessage && (
+            <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
+              <span>{errorMessage}</span>
+            </div>
+          )}
+
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-[#111111] uppercase tracking-wider block">
               ADMIN EMAIL
@@ -62,9 +96,11 @@ export default function AdminLoginPage() {
                 type="email"
                 placeholder="admin@vintagevault.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (errorMessage) setErrorMessage('');
+                }}
                 className="w-full bg-white border border-[#EAEAEA] text-[#111111] text-sm rounded-xl px-4 py-3 pl-11 focus:outline-none focus:border-[#111111] font-mono"
-                required
               />
               <Mail className="w-4 h-4 text-[#888888] absolute left-4" />
             </div>
@@ -79,9 +115,11 @@ export default function AdminLoginPage() {
                 type="password"
                 placeholder="••••••••"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (errorMessage) setErrorMessage('');
+                }}
                 className="w-full bg-white border border-[#EAEAEA] text-[#111111] text-sm rounded-xl px-4 py-3 pl-11 focus:outline-none focus:border-[#111111]"
-                required
               />
               <Lock className="w-4 h-4 text-[#888888] absolute left-4" />
             </div>
