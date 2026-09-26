@@ -10,6 +10,7 @@ import { Product } from '@/types';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { useToast } from '@/context/ToastContext';
+import { useAuth } from '@/context/AuthContext';
 import { formatCurrency } from '@/lib/whatsapp';
 import {
   Heart,
@@ -22,7 +23,19 @@ import {
   RotateCcw,
   ShieldCheck,
   ChevronRight,
+  MessageCircle,
 } from 'lucide-react';
+
+interface ReviewItem {
+  _id: string;
+  userId: string;
+  userName: string;
+  productId: string;
+  rating: number;
+  comment: string;
+  verifiedPurchase?: boolean;
+  createdAt: string;
+}
 
 export default function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -30,6 +43,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { showToast } = useToast();
+  const { user } = useAuth();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -37,6 +51,33 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   const [selectedColor, setSelectedColor] = useState<string>('');
   const [quantity, setQuantity] = useState<number>(1);
   const [activeTab, setActiveTab] = useState<'desc' | 'size' | 'delivery' | 'reviews'>('desc');
+
+  // Review states
+  const [reviewsList, setReviewsList] = useState<ReviewItem[]>([]);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [rating, setRating] = useState<number>(5);
+  const [hoverRating, setHoverRating] = useState<number>(0);
+  const [comment, setComment] = useState<string>('');
+  const [submittingReview, setSubmittingReview] = useState(false);
+
+  const fetchReviews = async () => {
+    try {
+      const res = await fetch(`/api/products/${id}/reviews`);
+      const data = await res.json();
+      if (data.success && data.reviews) {
+        setReviewsList(data.reviews);
+        if (data.reviews.length > 0) {
+          const totalRating = data.reviews.reduce((sum: number, r: ReviewItem) => sum + r.rating, 0);
+          const avgRating = Number((totalRating / data.reviews.length).toFixed(1));
+          setProduct((prev) =>
+            prev ? { ...prev, rating: avgRating, reviewsCount: data.reviews.length } : null
+          );
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch product reviews:', err);
+    }
+  };
 
   useEffect(() => {
     async function fetchProduct() {
@@ -59,7 +100,17 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
       }
     }
     fetchProduct();
+    fetchReviews();
   }, [id]);
+
+  const existingReview = user ? reviewsList.find((r) => r.userId === user._id) : null;
+
+  useEffect(() => {
+    if (existingReview) {
+      setRating(existingReview.rating);
+      setComment(existingReview.comment);
+    }
+  }, [existingReview]);
 
   if (loading) {
     return (
@@ -119,6 +170,89 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
     }
   };
 
+  const handleWriteReviewClick = () => {
+    if (!user) {
+      const currentPath = `/product/${product.slug || id}`;
+      router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
+      return;
+    }
+    setShowReviewForm((prev) => !prev);
+  };
+
+  const handleSubmitReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (rating === 0) {
+      showToast('Please select a rating.', 'error');
+      return;
+    }
+
+    const trimmedComment = comment.trim();
+    if (trimmedComment.length < 5) {
+      showToast('Review comment must be at least 5 characters long.', 'error');
+      return;
+    }
+
+    if (trimmedComment.length > 500) {
+      showToast('Review comment cannot exceed 500 characters.', 'error');
+      return;
+    }
+
+    setSubmittingReview(true);
+    try {
+      const res = await fetch(`/api/products/${id}/reviews`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rating, comment: trimmedComment }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast('Review submitted successfully.', 'success');
+        setShowReviewForm(false);
+        fetchReviews();
+        if (data.rating !== undefined && data.reviewsCount !== undefined) {
+          setProduct((prev) =>
+            prev ? { ...prev, rating: data.rating, reviewsCount: data.reviewsCount } : null
+          );
+        }
+      } else {
+        showToast(data.message || 'Unable to submit your review. Please try again.', 'error');
+      }
+    } catch (err) {
+      console.error('Submit review error:', err);
+      showToast('Unable to submit your review. Please try again.', 'error');
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
+
+  const formatDate = (dateStr?: string) => {
+    if (!dateStr) return 'Recently';
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return 'Recently';
+    return d.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  };
+
+  const defaultReviews: ReviewItem[] = [
+    {
+      _id: 'default-1',
+      userId: 'default-user-1',
+      userName: 'Mohammed Rizwan',
+      productId: id,
+      rating: 5,
+      comment: 'The fabric weight and stitching are incredible. Easily my favorite piece in the wardrobe right now.',
+      verifiedPurchase: true,
+      createdAt: new Date().toISOString(),
+    },
+  ];
+
+  const displayReviews = reviewsList.length > 0 ? reviewsList : defaultReviews;
+
   return (
     <div className="bg-white min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
@@ -165,12 +299,12 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                 <div className="flex items-center gap-1 text-amber-500">
                   <Star className="w-4 h-4 fill-current" />
                   <span className="font-bold text-[#111111] text-sm">
-                    {product.rating ? product.rating.toFixed(1) : '4.8'}
+                    {product.rating ? product.rating.toFixed(1) : '5.0'}
                   </span>
                 </div>
                 <span className="text-[#888888]">•</span>
                 <span className="text-[#666666] font-medium">
-                  {product.reviewsCount || 12} Verified Customer Reviews
+                  {product.reviewsCount || displayReviews.length} Verified Customer Reviews
                 </span>
               </div>
             </div>
@@ -354,7 +488,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
               { id: 'desc', label: 'DESCRIPTION' },
               { id: 'size', label: 'SIZE GUIDE' },
               { id: 'delivery', label: 'DELIVERY & RETURNS' },
-              { id: 'reviews', label: `REVIEWS (${product.reviewsCount || 12})` },
+              { id: 'reviews', label: `REVIEWS (${product.reviewsCount || displayReviews.length})` },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -423,25 +557,157 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             )}
 
             {activeTab === 'reviews' && (
-              <div className="space-y-4">
-                <h3 className="font-bold text-[#111111] text-base uppercase">CUSTOMER REVIEWS</h3>
-                <div className="space-y-4">
-                  <div className="p-4 rounded-2xl bg-[#F8F8F8] border border-[#EAEAEA] space-y-2">
-                    <div className="flex justify-between items-center text-xs">
-                      <span className="font-bold text-[#111111]">Mohammed Rizwan</span>
-                      <span className="text-[#888888] font-mono">Verified Purchase</span>
-                    </div>
-                    <div className="flex gap-1 text-amber-500">
-                      <Star className="w-3.5 h-3.5 fill-current" />
-                      <Star className="w-3.5 h-3.5 fill-current" />
-                      <Star className="w-3.5 h-3.5 fill-current" />
-                      <Star className="w-3.5 h-3.5 fill-current" />
-                      <Star className="w-3.5 h-3.5 fill-current" />
-                    </div>
-                    <p className="text-xs text-[#666666]">
-                      The fabric weight and stitching are incredible. Easily my favorite piece in the wardrobe right now.
+              <div className="space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#EAEAEA] pb-4">
+                  <div>
+                    <h3 className="font-bold text-[#111111] text-base uppercase">CUSTOMER REVIEWS</h3>
+                    <p className="text-xs text-[#888888] mt-0.5">
+                      Showing {displayReviews.length} review{displayReviews.length !== 1 ? 's' : ''}
                     </p>
                   </div>
+                  <button
+                    onClick={handleWriteReviewClick}
+                    className="bg-[#111111] hover:bg-zinc-800 text-white font-black text-xs px-5 py-3 rounded-xl uppercase tracking-wider transition-all shadow-sm shrink-0 self-start sm:self-auto flex items-center gap-2"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    <span>{existingReview ? 'EDIT YOUR REVIEW' : 'WRITE A REVIEW'}</span>
+                  </button>
+                </div>
+
+                {/* REVIEW FORM CARD */}
+                {showReviewForm && (
+                  <div className="p-6 rounded-3xl bg-[#F8F8F8] border border-[#EAEAEA] space-y-5 shadow-sm">
+                    <div className="flex justify-between items-center border-b border-[#EAEAEA] pb-3">
+                      <div>
+                        <h4 className="font-black text-[#111111] text-sm uppercase">
+                          {existingReview ? 'EDIT YOUR REVIEW' : 'WRITE A REVIEW'}
+                        </h4>
+                        {user && (
+                          <p className="text-xs text-[#666666]">
+                            Reviewing as <strong className="text-[#111111]">{user.name}</strong>
+                          </p>
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setShowReviewForm(false)}
+                        className="text-xs text-[#888888] hover:text-[#111111] font-semibold"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+
+                    <form onSubmit={handleSubmitReview} className="space-y-4">
+                      {/* Star Rating */}
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-[#111111] uppercase tracking-wider block">
+                          YOUR RATING *
+                        </label>
+                        <div className="flex items-center gap-1.5">
+                          {[1, 2, 3, 4, 5].map((starVal) => {
+                            const isFilled = starVal <= (hoverRating || rating);
+                            return (
+                              <button
+                                type="button"
+                                key={starVal}
+                                onClick={() => setRating(starVal)}
+                                onMouseEnter={() => setHoverRating(starVal)}
+                                onMouseLeave={() => setHoverRating(0)}
+                                className="p-1 focus:outline-none transition-transform hover:scale-110"
+                                aria-label={`Rate ${starVal} stars`}
+                              >
+                                <Star
+                                  className={`w-6 h-6 ${
+                                    isFilled ? 'fill-amber-400 text-amber-400' : 'text-zinc-300'
+                                  }`}
+                                />
+                              </button>
+                            );
+                          })}
+                          <span className="text-xs font-bold text-[#111111] ml-2 font-mono">
+                            {rating > 0 ? `${rating} / 5` : 'Select rating'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Review Comment */}
+                      <div className="space-y-1">
+                        <div className="flex justify-between items-center text-xs">
+                          <label className="font-bold text-[#111111] uppercase tracking-wider block">
+                            YOUR REVIEW *
+                          </label>
+                          <span className="text-[#888888] font-mono">
+                            {comment.length} / 500
+                          </span>
+                        </div>
+                        <textarea
+                          rows={4}
+                          maxLength={500}
+                          placeholder="Write your review here... (Minimum 5 characters)"
+                          value={comment}
+                          onChange={(e) => setComment(e.target.value)}
+                          className="w-full bg-white border border-[#EAEAEA] text-[#111111] text-xs rounded-xl p-4 focus:outline-none focus:border-[#111111]"
+                          required
+                        />
+                      </div>
+
+                      <div className="flex justify-end gap-3 pt-2">
+                        <button
+                          type="button"
+                          onClick={() => setShowReviewForm(false)}
+                          className="px-5 py-2.5 rounded-xl border border-[#EAEAEA] text-xs font-bold text-[#666666] hover:text-[#111111] uppercase"
+                        >
+                          CANCEL
+                        </button>
+                        <button
+                          type="submit"
+                          disabled={submittingReview}
+                          className="px-6 py-2.5 rounded-xl bg-[#111111] hover:bg-zinc-800 text-white text-xs font-black uppercase tracking-wider shadow-md disabled:opacity-50"
+                        >
+                          {submittingReview ? 'SUBMITTING...' : existingReview ? 'UPDATE REVIEW' : 'SUBMIT REVIEW'}
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                )}
+
+                {/* REVIEWS LIST */}
+                <div className="space-y-4">
+                  {displayReviews.map((rev) => (
+                    <div
+                      key={rev._id}
+                      className="p-4 sm:p-5 rounded-2xl bg-[#F8F8F8] border border-[#EAEAEA] space-y-2.5 shadow-sm"
+                    >
+                      <div className="flex justify-between items-center text-xs">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-[#111111]">{rev.userName}</span>
+                          {rev.verifiedPurchase && (
+                            <span className="text-[10px] font-bold text-[#25D366] bg-[#25D366]/10 border border-[#25D366]/30 px-2 py-0.5 rounded-full uppercase font-mono">
+                              Verified Purchase
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[#888888] font-mono text-[11px]">
+                          {formatDate(rev.createdAt)}
+                        </span>
+                      </div>
+
+                      <div className="flex gap-1 text-amber-400">
+                        {[1, 2, 3, 4, 5].map((starIdx) => (
+                          <Star
+                            key={starIdx}
+                            className={`w-3.5 h-3.5 ${
+                              starIdx <= rev.rating ? 'fill-current' : 'text-zinc-300'
+                            }`}
+                          />
+                        ))}
+                      </div>
+
+                      <p className="text-xs text-[#444444] leading-relaxed font-medium">
+                        {rev.comment}
+                      </p>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
