@@ -1,6 +1,6 @@
 import { Order } from '@/types';
 
-export const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '919876543210';
+export const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '919605332248';
 
 export function formatCurrency(amount: number): string {
   return `₹${amount.toLocaleString('en-IN')}`;

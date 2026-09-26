@@ -4,7 +4,6 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { MessageCircle } from 'lucide-react';
-import { WHATSAPP_NUMBER } from '@/lib/whatsapp';
 
 function InstagramIcon({ className = 'w-4 h-4' }: { className?: string }) {
   return (
@@ -50,6 +49,8 @@ export default function Footer() {
     return null;
   }
 
+  const whatsappUrl = "https://wa.me/919605332248?text=Hello%20VINTAGE%20VAULT%2C%20I%20need%20assistance.";
+
   return (
     <footer className="bg-white text-[#666666] border-t border-[#EAEAEA] pt-16 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -69,18 +70,18 @@ export default function Footer() {
             </p>
             <div className="flex items-center space-x-4 pt-2">
               <a
-                href={`https://wa.me/${WHATSAPP_NUMBER}`}
+                href={whatsappUrl}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="w-9 h-9 rounded-full bg-[#25D366]/10 border border-[#25D366]/30 text-[#25D366] flex items-center justify-center hover:bg-[#25D366] hover:text-white transition-colors"
-                aria-label="WhatsApp Support"
+                aria-label="WhatsApp"
               >
                 <MessageCircle className="w-4 h-4" />
               </a>
               <a
-                href="https://instagram.com"
+                href="https://www.instagram.com/__.vintagevault/"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="w-9 h-9 rounded-full bg-[#F8F8F8] border border-[#EAEAEA] text-[#111111] flex items-center justify-center hover:bg-[#111111] hover:text-white transition-colors"
                 aria-label="Instagram"
               >
@@ -89,7 +90,7 @@ export default function Footer() {
               <a
                 href="https://facebook.com"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="w-9 h-9 rounded-full bg-[#F8F8F8] border border-[#EAEAEA] text-[#111111] flex items-center justify-center hover:bg-[#111111] hover:text-white transition-colors"
                 aria-label="Facebook"
               >
@@ -160,7 +161,12 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noreferrer" className="hover:text-[#111111] transition-colors">
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-[#111111] transition-colors"
+                >
                   Contact Us (WhatsApp)
                 </a>
               </li>
@@ -202,7 +208,21 @@ export default function Footer() {
 
         {/* Bottom copyright */}
         <div className="pt-8 flex flex-col md:flex-row items-center justify-between text-xs text-[#888888] gap-4">
-          <p>© {new Date().getFullYear()} VINTAGE VAULT. All rights reserved.</p>
+          <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-3 text-center sm:text-left">
+            <p>© 2026 VINTAGE VAULT. All rights reserved.</p>
+            <span className="hidden sm:inline text-[#CCCCCC]">•</span>
+            <p className="text-[#888888]">
+              Developed by{' '}
+              <a
+                href="https://www.pixelriftonline.online/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-[#111111] hover:underline transition-colors"
+              >
+                Pixelrift
+              </a>
+            </p>
+          </div>
           <div className="flex items-center space-x-6 text-[11px]">
             <span>Privacy Policy</span>
             <span>Terms of Service</span>
