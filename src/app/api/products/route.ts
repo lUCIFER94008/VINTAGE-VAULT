@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { connectToDatabase } from '@/lib/db';
 import { Product } from '@/lib/models/Product';
+import { Category } from '@/lib/models/Category';
 import { requireAdmin } from '@/lib/auth';
 
 export async function GET(req: NextRequest) {
@@ -117,34 +119,98 @@ export async function POST(req: NextRequest) {
       isActive,
     } = body;
 
-    if (!name || !category || !price || !images || images.length === 0) {
+    // Validate required fields
+    if (!name || typeof name !== 'string' || !name.trim()) {
       return NextResponse.json(
-        { success: false, message: 'Name, Category, Price, and at least one Image are required.' },
+        { success: false, message: 'Product name is required.' },
+        { status: 400 }
+      );
+    }
+
+    if (!category || typeof category !== 'string' || !category.trim()) {
+      return NextResponse.json(
+        { success: false, message: 'Category is required.' },
+        { status: 400 }
+      );
+    }
+
+    const numPrice = Number(price);
+    if (isNaN(numPrice) || numPrice < 0) {
+      return NextResponse.json(
+        { success: false, message: 'Valid sale price is required.' },
+        { status: 400 }
+      );
+    }
+
+    if (!images || !Array.isArray(images) || images.length === 0) {
+      return NextResponse.json(
+        { success: false, message: 'At least one product image is required.' },
         { status: 400 }
       );
     }
 
     await connectToDatabase();
 
-    const slug = name
+    const trimmedName = name.trim();
+    const trimmedCategory = category.trim();
+
+    // Verify category exists or normalize
+    const categoryDoc = await Category.findOne({
+      $or: [
+        { slug: trimmedCategory.toLowerCase() },
+        { name: new RegExp(`^${trimmedCategory}$`, 'i') },
+      ],
+    });
+
+    const categorySlug = categoryDoc ? categoryDoc.slug : trimmedCategory.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+    // Safe unique slug generation
+    let baseSlug = trimmedName
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)+/g, '') + '-' + Date.now();
+      .replace(/(^-|-$)+/g, '');
 
-    const calculatedDiscount = discount !== undefined ? discount : Math.round(((originalPrice - price) / originalPrice) * 100);
+    if (!baseSlug) {
+      baseSlug = 'product-' + Date.now();
+    }
+
+    let uniqueSlug = baseSlug;
+    let existingProduct = await Product.findOne({ slug: uniqueSlug });
+    let counter = 1;
+    while (existingProduct) {
+      uniqueSlug = `${baseSlug}-${counter}`;
+      existingProduct = await Product.findOne({ slug: uniqueSlug });
+      counter++;
+    }
+
+    // Safe numerical conversions
+    const numOriginalPrice = Number(originalPrice && Number(originalPrice) >= numPrice ? originalPrice : numPrice);
+    const numStock = isNaN(Number(stock)) ? 0 : Math.max(0, Number(stock));
+
+    let calculatedDiscount = 0;
+    if (discount !== undefined && !isNaN(Number(discount))) {
+      calculatedDiscount = Math.max(0, Math.min(100, Number(discount)));
+    } else if (numOriginalPrice > numPrice) {
+      calculatedDiscount = Math.round(((numOriginalPrice - numPrice) / numOriginalPrice) * 100);
+    }
+
+    // Clean arrays
+    const cleanSizes = Array.isArray(sizes) && sizes.length > 0 ? sizes.map(s => String(s).trim()) : ['S', 'M', 'L', 'XL'];
+    const cleanColors = Array.isArray(colors) && colors.length > 0 ? colors.map(c => String(c).trim()) : ['Black'];
+    const cleanImages = images.map(img => String(img).trim()).filter(Boolean);
 
     const product = await Product.create({
-      name,
-      slug,
-      category,
-      description: description || '',
-      price: Number(price),
-      originalPrice: Number(originalPrice || price),
+      name: trimmedName,
+      slug: uniqueSlug,
+      category: categorySlug,
+      description: description ? String(description).trim() : trimmedName,
+      price: numPrice,
+      originalPrice: numOriginalPrice,
       discount: calculatedDiscount,
-      stock: Number(stock || 0),
-      sizes: sizes || ['S', 'M', 'L', 'XL'],
-      colors: colors || ['Black'],
-      images,
+      stock: numStock,
+      sizes: cleanSizes,
+      colors: cleanColors,
+      images: cleanImages,
       isFeatured: Boolean(isFeatured),
       isNewArrival: Boolean(isNewArrival),
       isActive: isActive !== undefined ? Boolean(isActive) : true,
@@ -152,15 +218,32 @@ export async function POST(req: NextRequest) {
       reviewsCount: 1,
     });
 
-    return NextResponse.json({
-      success: true,
-      message: 'Product created successfully!',
-      product,
-    });
+    // Revalidate relevant pages
+    try {
+      revalidatePath('/products');
+      revalidatePath('/admin/products');
+      revalidatePath('/');
+      revalidatePath(`/category/${categorySlug}`);
+    } catch (e) {
+      // Ignore cache revalidation errors if any
+    }
+
+    return NextResponse.json(
+      {
+        success: true,
+        message: 'Product created successfully!',
+        product,
+      },
+      { status: 201 }
+    );
   } catch (error: any) {
     console.error('Create product API error:', error);
     return NextResponse.json(
-      { success: false, message: 'Failed to create product.', error: error.message },
+      {
+        success: false,
+        message: error.message || 'Failed to create product.',
+        error: error.message,
+      },
       { status: 500 }
     );
   }

@@ -101,23 +101,37 @@ export default function AddProductPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !price || images.length === 0) {
-      showToast('Product name, price, and at least one image are required.', 'error');
+
+    if (!name.trim()) {
+      showToast('Product name is required.', 'error');
+      return;
+    }
+
+    if (!price || isNaN(Number(price))) {
+      showToast('Valid sale price is required.', 'error');
+      return;
+    }
+
+    if (images.length === 0) {
+      showToast('At least one product image is required.', 'error');
       return;
     }
 
     setLoading(true);
     try {
+      const numPrice = Number(price);
+      const numOriginal = originalPrice ? Number(originalPrice) : numPrice;
+
       const res = await fetch('/api/products', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name,
+          name: name.trim(),
           category,
-          description,
-          price: Number(price),
-          originalPrice: Number(originalPrice || Number(price) * 2),
-          stock: Number(stock),
+          description: description.trim(),
+          price: numPrice,
+          originalPrice: numOriginal,
+          stock: Number(stock || 0),
           sizes,
           colors,
           images,
@@ -128,14 +142,15 @@ export default function AddProductPage() {
       });
 
       const data = await res.json();
-      if (data.success) {
-        showToast('Product created successfully in MongoDB!', 'success');
+      if (res.ok && data.success) {
+        showToast('PRODUCT CREATED SUCCESSFULLY', 'success');
         router.push('/admin/products');
       } else {
-        showToast(data.message || 'Failed to create product.', 'error');
+        const errorMsg = data.message || data.error || 'Failed to create product.';
+        showToast(errorMsg, 'error');
       }
-    } catch (err) {
-      showToast('Error creating product.', 'error');
+    } catch (err: any) {
+      showToast(err?.message || 'Network error while creating product.', 'error');
     } finally {
       setLoading(false);
     }
