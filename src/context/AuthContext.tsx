@@ -7,6 +7,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (email: string, pass: string) => Promise<{ success: boolean; message?: string }>;
+  adminLogin: (email: string, pass: string) => Promise<{ success: boolean; message?: string; status?: number }>;
   register: (name: string, email: string, phone: string, pass: string) => Promise<{ success: boolean; message?: string }>;
   logout: () => Promise<void>;
   updateUserAddresses: (addresses: Address[]) => void;
@@ -55,6 +56,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const adminLogin = async (email: string, pass: string) => {
+    try {
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password: pass }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success && data.user) {
+        setUser(data.user);
+        return { success: true };
+      }
+      return { success: false, message: data.message || 'Admin authentication failed.', status: res.status };
+    } catch (err: any) {
+      return { success: false, message: 'Network error during admin login.' };
+    }
+  };
+
   const register = async (name: string, email: string, phone: string, pass: string) => {
     try {
       const res = await fetch('/api/auth/register', {
@@ -94,6 +113,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user,
         loading,
         login,
+        adminLogin,
         register,
         logout,
         updateUserAddresses,

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import { User } from '@/lib/models/User';
-import { comparePassword, hashPassword, signToken } from '@/lib/auth';
+import { comparePassword, signToken } from '@/lib/auth';
 
 export async function POST(req: NextRequest) {
   try {
@@ -18,26 +18,18 @@ export async function POST(req: NextRequest) {
 
     const normalizedEmail = String(email).toLowerCase().trim();
     const envAdminEmail = (process.env.ADMIN_EMAIL || 'admin@vintagevault.com').toLowerCase().trim();
-    const envAdminPassword = process.env.ADMIN_PASSWORD || 'admin123';
 
     // 1. Check if user exists by email or phone
-    let user = await User.findOne({
+    const user = await User.findOne({
       $or: [{ email: normalizedEmail }, { phone: email.trim() }],
     });
 
-    // Auto-create/sync admin user if logging in as admin email and user doesn't exist yet
-    if (normalizedEmail === envAdminEmail) {
-      if (!user) {
-        const hashedPassword = await hashPassword(envAdminPassword);
-        user = await User.create({
-          name: 'VINTAGE VAULT Admin',
-          email: envAdminEmail,
-          phone: '9876543210',
-          password: hashedPassword,
-          role: 'admin',
-          isActive: true,
-        });
-      }
+    // 2. Reject admin account on customer login route
+    if (user && (user.role === 'admin' || normalizedEmail === envAdminEmail)) {
+      return NextResponse.json(
+        { success: false, message: 'Please use the administrator login.' },
+        { status: 403 }
+      );
     }
 
     if (!user) {
@@ -47,17 +39,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Compare password
-    let isMatch = await comparePassword(password, user.password);
-
-    // If password didn't match hash, but matches process.env.ADMIN_PASSWORD for admin user, update DB hash
-    if (!isMatch && user.role === 'admin' && (normalizedEmail === envAdminEmail || user.email === envAdminEmail)) {
-      if (password === envAdminPassword) {
-        isMatch = true;
-        user.password = await hashPassword(envAdminPassword);
-        await user.save();
-      }
-    }
+    // 3. Compare password
+    const isMatch = await comparePassword(password, user.password);
 
     if (!isMatch) {
       return NextResponse.json(
@@ -99,7 +82,7 @@ export async function POST(req: NextRequest) {
 
     return response;
   } catch (error: any) {
-    console.error('Login API error:', error);
+    console.error('Customer login API error:', error);
     return NextResponse.json(
       { success: false, message: 'Internal server error during login.' },
       { status: 500 }
