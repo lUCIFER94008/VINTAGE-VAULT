@@ -203,11 +203,6 @@ export default function Footer() {
                   My Wishlist
                 </Link>
               </li>
-              <li>
-                <Link href="/admin/login" className="text-[#888888] hover:text-[#111111] transition-colors pt-2 block font-mono">
-                  Admin Portal
-                </Link>
-              </li>
             </ul>
           </div>
         </div>
