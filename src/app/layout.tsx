@@ -10,9 +10,9 @@ export const metadata: Metadata = {
   description:
     'Premium 5-Sleeve Jerseys, Vintage Raw Jeans & Everyday Streetwear Essentials.',
   icons: {
-    icon: 'https://res.cloudinary.com/dpmpefw2p/image/upload/v1790496666/WhatsApp_Image_2026-09-27_at_10.45.42_AM_lygban.jpg',
-    shortcut: 'https://res.cloudinary.com/dpmpefw2p/image/upload/v1790496666/WhatsApp_Image_2026-09-27_at_10.45.42_AM_lygban.jpg',
-    apple: 'https://res.cloudinary.com/dpmpefw2p/image/upload/v1790496666/WhatsApp_Image_2026-09-27_at_10.45.42_AM_lygban.jpg',
+    icon: 'https://res.cloudinary.com/dpmpefw2p/image/upload/v1790498090/WhatsApp_Image_2026-09-27_at_10.45.42_AM_lygban.png',
+    shortcut: 'https://res.cloudinary.com/dpmpefw2p/image/upload/v1790498090/WhatsApp_Image_2026-09-27_at_10.45.42_AM_lygban.png',
+    apple: 'https://res.cloudinary.com/dpmpefw2p/image/upload/v1790498090/WhatsApp_Image_2026-09-27_at_10.45.42_AM_lygban.png',
   },
   keywords: [
     'Vintage Vault',

@@ -60,7 +60,7 @@ export default function Footer() {
             <Link href="/" className="inline-flex items-center gap-2.5 group">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="https://res.cloudinary.com/dpmpefw2p/image/upload/v1790496666/WhatsApp_Image_2026-09-27_at_10.45.42_AM_lygban.jpg"
+                src="https://res.cloudinary.com/dpmpefw2p/image/upload/v1790498090/WhatsApp_Image_2026-09-27_at_10.45.42_AM_lygban.png"
                 alt="VINTAGE VAULT Logo"
                 className="w-9 h-9 object-contain rounded-md border border-[#EAEAEA] shrink-0"
               />

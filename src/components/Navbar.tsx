@@ -63,7 +63,7 @@ export default function Navbar() {
             <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="https://res.cloudinary.com/dpmpefw2p/image/upload/v1790496666/WhatsApp_Image_2026-09-27_at_10.45.42_AM_lygban.jpg"
+                src="https://res.cloudinary.com/dpmpefw2p/image/upload/v1790498090/WhatsApp_Image_2026-09-27_at_10.45.42_AM_lygban.png"
                 alt="VINTAGE VAULT Logo"
                 className="w-10 h-10 sm:w-11 sm:h-11 object-contain rounded-md shrink-0 border border-[#EAEAEA]"
               />
@@ -190,7 +190,7 @@ export default function Navbar() {
                 <div className="flex items-center gap-2.5">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src="https://res.cloudinary.com/dpmpefw2p/image/upload/v1790496666/WhatsApp_Image_2026-09-27_at_10.45.42_AM_lygban.jpg"
+                    src="https://res.cloudinary.com/dpmpefw2p/image/upload/v1790498090/WhatsApp_Image_2026-09-27_at_10.45.42_AM_lygban.png"
                     alt="VINTAGE VAULT Logo"
                     className="w-8 h-8 object-contain rounded-md shrink-0 border border-[#EAEAEA]"
                   />
