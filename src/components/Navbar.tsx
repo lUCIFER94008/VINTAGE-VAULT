@@ -60,13 +60,21 @@ export default function Navbar() {
             </div>
 
             {/* Logo */}
-            <Link href="/" className="flex flex-col items-start group">
-              <span className="text-xl sm:text-2xl font-black tracking-tighter uppercase text-[#111111] group-hover:text-zinc-600 transition-colors">
-                VINTAGE VAULT
-              </span>
-              <span className="text-[9px] tracking-[0.25em] text-[#666666] font-bold uppercase -mt-1">
-                TIMELESS STYLE
-              </span>
+            <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="https://res.cloudinary.com/dpmpefw2p/image/upload/v1790496666/WhatsApp_Image_2026-09-27_at_10.45.42_AM_lygban.jpg"
+                alt="VINTAGE VAULT Logo"
+                className="w-10 h-10 sm:w-11 sm:h-11 object-contain rounded-md shrink-0 border border-[#EAEAEA]"
+              />
+              <div className="flex flex-col items-start">
+                <span className="text-xl sm:text-2xl font-black tracking-tighter uppercase text-[#111111] group-hover:text-zinc-600 transition-colors leading-none">
+                  VINTAGE VAULT
+                </span>
+                <span className="text-[9px] tracking-[0.25em] text-[#666666] font-bold uppercase mt-1">
+                  TIMELESS STYLE
+                </span>
+              </div>
             </Link>
 
             {/* Desktop Navigation Links */}
@@ -179,7 +187,15 @@ export default function Navbar() {
           <div className="relative w-4/5 max-w-xs bg-white text-[#111111] h-full flex flex-col justify-between p-6 z-10 border-r border-[#EAEAEA] shadow-2xl">
             <div>
               <div className="flex items-center justify-between pb-6 border-b border-[#EAEAEA]">
-                <span className="text-lg font-black tracking-tight uppercase text-[#111111]">VINTAGE VAULT</span>
+                <div className="flex items-center gap-2.5">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="https://res.cloudinary.com/dpmpefw2p/image/upload/v1790496666/WhatsApp_Image_2026-09-27_at_10.45.42_AM_lygban.jpg"
+                    alt="VINTAGE VAULT Logo"
+                    className="w-8 h-8 object-contain rounded-md shrink-0 border border-[#EAEAEA]"
+                  />
+                  <span className="text-lg font-black tracking-tight uppercase text-[#111111]">VINTAGE VAULT</span>
+                </div>
                 <button
                   onClick={() => setMobileMenuOpen(false)}
                   className="p-2 text-[#666666] hover:text-[#111111]"

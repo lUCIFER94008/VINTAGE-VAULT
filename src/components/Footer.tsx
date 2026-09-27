@@ -57,8 +57,14 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-[#EAEAEA]">
           {/* Brand Info */}
           <div className="lg:col-span-2 space-y-4">
-            <Link href="/" className="inline-block">
-              <span className="text-2xl font-black tracking-tighter text-[#111111] uppercase">
+            <Link href="/" className="inline-flex items-center gap-2.5 group">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="https://res.cloudinary.com/dpmpefw2p/image/upload/v1790496666/WhatsApp_Image_2026-09-27_at_10.45.42_AM_lygban.jpg"
+                alt="VINTAGE VAULT Logo"
+                className="w-9 h-9 object-contain rounded-md border border-[#EAEAEA] shrink-0"
+              />
+              <span className="text-2xl font-black tracking-tighter text-[#111111] uppercase group-hover:text-zinc-600 transition-colors">
                 VINTAGE VAULT
               </span>
             </Link>

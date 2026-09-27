@@ -6,9 +6,14 @@ import ClientLayout from '@/components/ClientLayout';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'VINTAGE VAULT | Jerseys, Jeans & Streetwear',
+  title: 'VINTAGE VAULT | Timeless Style',
   description:
-    'Timeless Style. Always Wins. Premium 5-sleeve jerseys, vintage wash raw denim jeans, full sleeve woven shirts, socks, caps & retro glasses.',
+    'Premium 5-Sleeve Jerseys, Vintage Raw Jeans & Everyday Streetwear Essentials.',
+  icons: {
+    icon: 'https://res.cloudinary.com/dpmpefw2p/image/upload/v1790496666/WhatsApp_Image_2026-09-27_at_10.45.42_AM_lygban.jpg',
+    shortcut: 'https://res.cloudinary.com/dpmpefw2p/image/upload/v1790496666/WhatsApp_Image_2026-09-27_at_10.45.42_AM_lygban.jpg',
+    apple: 'https://res.cloudinary.com/dpmpefw2p/image/upload/v1790496666/WhatsApp_Image_2026-09-27_at_10.45.42_AM_lygban.jpg',
+  },
   keywords: [
     'Vintage Vault',
     'Streetwear',
