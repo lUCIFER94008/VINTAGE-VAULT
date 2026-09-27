@@ -66,7 +66,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { items, customerName, phone, address, city, state, pincode, landmark, userId } = body;
+    const { items, customerName, phone, additionalPhone, address, city, state, pincode, landmark, userId } = body;
 
     if (!items || items.length === 0) {
       return NextResponse.json(
@@ -139,6 +139,7 @@ export async function POST(req: NextRequest) {
       userId: effectiveUserId,
       customerName,
       phone,
+      additionalPhone: additionalPhone || '',
       items: validatedItems,
       totalAmount: calculatedTotal,
       address,

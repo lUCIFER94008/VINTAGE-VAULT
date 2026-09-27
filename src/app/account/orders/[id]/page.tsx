@@ -192,7 +192,10 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
 
             <div className="text-xs text-[#111111] space-y-1">
               <p className="font-bold text-[#111111] text-sm">{order.customerName}</p>
-              <p className="text-[#666666] font-mono">{order.phone}</p>
+              <p className="text-[#666666] font-mono">Phone: {order.phone}</p>
+              {order.additionalPhone && (
+                <p className="text-[#666666] font-mono">Additional Phone: {order.additionalPhone}</p>
+              )}
               <p className="pt-2 text-[#666666]">{order.address}</p>
               <p className="text-[#666666]">
                 {order.city}, {order.state} - {order.pincode}

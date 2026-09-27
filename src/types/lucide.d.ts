@@ -27,6 +27,7 @@ declare module 'lucide-react' {
   export const ArrowUpDown: React.FC<any>;
   export const Share2: React.FC<any>;
   export const ChevronRight: React.FC<any>;
+  export const ChevronDown: React.FC<any>;
   export const Trash2: React.FC<any>;
   export const MapPin: React.FC<any>;
   export const CheckCircle2: React.FC<any>;

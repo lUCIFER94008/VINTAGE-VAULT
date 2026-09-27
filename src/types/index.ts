@@ -44,6 +44,7 @@ export interface Address {
   _id?: string;
   fullName: string;
   phone: string;
+  additionalPhone?: string;
   house: string;
   street: string;
   area: string;
@@ -69,6 +70,7 @@ export interface Order {
   userId?: string;
   customerName: string;
   phone: string;
+  additionalPhone?: string;
   items: OrderItem[];
   totalAmount: number;
   address: string;

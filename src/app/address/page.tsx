@@ -7,8 +7,27 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 import { useToast } from '@/context/ToastContext';
-import { MapPin, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { MapPin, ArrowRight, CheckCircle2, ChevronDown } from 'lucide-react';
 import { Address } from '@/types';
+import { INDIAN_STATES, INDIAN_UTS } from '@/lib/constants';
+
+function normalizePhone(p: string): string {
+  if (!p) return '';
+  let cleaned = p.trim().replace(/[^\d+]/g, '');
+  if (cleaned.startsWith('+91')) {
+    cleaned = cleaned.slice(3);
+  } else if (cleaned.length === 12 && cleaned.startsWith('91')) {
+    cleaned = cleaned.slice(2);
+  } else if (cleaned.length === 11 && cleaned.startsWith('0')) {
+    cleaned = cleaned.slice(1);
+  }
+  return cleaned;
+}
+
+function isValidIndianPhone(phone: string): boolean {
+  const norm = normalizePhone(phone);
+  return /^\d{10}$/.test(norm);
+}
 
 export default function AddressPage() {
   const router = useRouter();
@@ -19,6 +38,7 @@ export default function AddressPage() {
   const [formData, setFormData] = useState<Address>({
     fullName: user?.name || '',
     phone: user?.phone || '',
+    additionalPhone: '',
     house: '',
     street: '',
     area: '',
@@ -40,7 +60,10 @@ export default function AddressPage() {
   useEffect(() => {
     if (user && user.addresses && user.addresses.length > 0) {
       const defaultAddr = user.addresses[0];
-      setFormData(defaultAddr);
+      setFormData({
+        ...defaultAddr,
+        additionalPhone: defaultAddr.additionalPhone || '',
+      });
       setSelectedSavedIndex(0);
     } else if (user) {
       setFormData((prev) => ({
@@ -54,17 +77,42 @@ export default function AddressPage() {
   const validate = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.fullName.trim()) newErrors.fullName = 'Full Name is required';
-    if (!formData.phone.trim() || !/^[6-9]\d{9}$/.test(formData.phone.trim())) {
-      newErrors.phone = 'Enter a valid 10-digit Indian mobile number';
+    if (!formData.fullName.trim()) {
+      newErrors.fullName = 'Full Name is required';
     }
-    if (!formData.house.trim()) newErrors.house = 'House / Building No. is required';
-    if (!formData.street.trim()) newErrors.street = 'Street / Road name is required';
-    if (!formData.area.trim()) newErrors.area = 'Area / Locality is required';
-    if (!formData.city.trim()) newErrors.city = 'City is required';
-    if (!formData.state.trim()) newErrors.state = 'State is required';
+
+    if (!formData.phone.trim() || !isValidIndianPhone(formData.phone)) {
+      newErrors.phone = 'Please enter a valid 10-digit Indian mobile number.';
+    }
+
+    if (formData.additionalPhone && formData.additionalPhone.trim() !== '') {
+      if (!isValidIndianPhone(formData.additionalPhone)) {
+        newErrors.additionalPhone = 'Please enter a valid 10-digit Indian mobile number.';
+      }
+    }
+
+    if (!formData.house.trim()) {
+      newErrors.house = 'House / Building No. is required';
+    }
+
+    if (!formData.street.trim()) {
+      newErrors.street = 'Street / Road name is required';
+    }
+
+    if (!formData.area.trim()) {
+      newErrors.area = 'Area / Locality is required';
+    }
+
+    if (!formData.city.trim()) {
+      newErrors.city = 'City is required';
+    }
+
+    if (!formData.state.trim() || formData.state === 'Select State') {
+      newErrors.state = 'Please select your state.';
+    }
+
     if (!formData.pincode.trim() || !/^\d{6}$/.test(formData.pincode.trim())) {
-      newErrors.pincode = 'Enter a valid 6-digit Indian Pincode';
+      newErrors.pincode = 'Please enter a valid 6-digit pincode.';
     }
 
     setErrors(newErrors);
@@ -73,7 +121,10 @@ export default function AddressPage() {
 
   const handleSelectSavedAddress = (idx: number, addr: Address) => {
     setSelectedSavedIndex(idx);
-    setFormData(addr);
+    setFormData({
+      ...addr,
+      additionalPhone: addr.additionalPhone || '',
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -83,8 +134,15 @@ export default function AddressPage() {
       return;
     }
 
+    // Normalize phone numbers before saving to checkout state
+    const normalizedData: Address = {
+      ...formData,
+      phone: normalizePhone(formData.phone),
+      additionalPhone: formData.additionalPhone ? normalizePhone(formData.additionalPhone) : '',
+    };
+
     // Save temporary address data to localStorage for order summary
-    localStorage.setItem('vv_checkout_address', JSON.stringify(formData));
+    localStorage.setItem('vv_checkout_address', JSON.stringify(normalizedData));
     router.push('/order-summary');
   };
 
@@ -132,7 +190,10 @@ export default function AddressPage() {
                       <CheckCircle2 className="w-4 h-4 text-[#25D366]" />
                     )}
                   </div>
-                  <p className="text-xs text-[#666666] mt-1">{addr.phone}</p>
+                  <p className="text-xs text-[#666666] mt-1 font-mono">Phone: {addr.phone}</p>
+                  {addr.additionalPhone && (
+                    <p className="text-xs text-[#666666] font-mono">Additional Phone: {addr.additionalPhone}</p>
+                  )}
                   <p className="text-xs text-[#111111] mt-2 line-clamp-2">
                     {addr.house}, {addr.street}, {addr.area}, {addr.city}, {addr.state} - {addr.pincode}
                   </p>
@@ -152,7 +213,7 @@ export default function AddressPage() {
               </label>
               <input
                 type="text"
-                placeholder="e.g. Mohammed Rizwan"
+                placeholder="Full Name"
                 value={formData.fullName}
                 onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                 className={`w-full bg-white border ${
@@ -169,7 +230,7 @@ export default function AddressPage() {
               </label>
               <input
                 type="tel"
-                placeholder="e.g. 9876543210"
+                placeholder="Primary Phone"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 className={`w-full bg-white border ${
@@ -179,6 +240,25 @@ export default function AddressPage() {
               {errors.phone && <p className="text-xs text-[#DC2626]">{errors.phone}</p>}
             </div>
 
+            {/* Additional Phone Number (Optional) */}
+            <div className="sm:col-span-2 space-y-1.5">
+              <label className="text-xs font-bold text-[#111111] uppercase tracking-wider block">
+                ADDITIONAL PHONE NUMBER (OPTIONAL)
+              </label>
+              <input
+                type="tel"
+                placeholder="Additional Phone Number"
+                value={formData.additionalPhone || ''}
+                onChange={(e) => setFormData({ ...formData, additionalPhone: e.target.value })}
+                className={`w-full bg-white border ${
+                  errors.additionalPhone ? 'border-[#DC2626]' : 'border-[#EAEAEA]'
+                } text-[#111111] text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-[#111111]`}
+              />
+              {errors.additionalPhone && (
+                <p className="text-xs text-[#DC2626]">{errors.additionalPhone}</p>
+              )}
+            </div>
+
             {/* House / Building */}
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-[#111111] uppercase tracking-wider block">
@@ -186,7 +266,7 @@ export default function AddressPage() {
               </label>
               <input
                 type="text"
-                placeholder="e.g. Flat 4B, Vault Apartments"
+                placeholder="House / Building"
                 value={formData.house}
                 onChange={(e) => setFormData({ ...formData, house: e.target.value })}
                 className={`w-full bg-white border ${
@@ -203,7 +283,7 @@ export default function AddressPage() {
               </label>
               <input
                 type="text"
-                placeholder="e.g. Main Street"
+                placeholder="Street / Road"
                 value={formData.street}
                 onChange={(e) => setFormData({ ...formData, street: e.target.value })}
                 className={`w-full bg-white border ${
@@ -220,7 +300,7 @@ export default function AddressPage() {
               </label>
               <input
                 type="text"
-                placeholder="e.g. Marine Drive"
+                placeholder="Area / Locality"
                 value={formData.area}
                 onChange={(e) => setFormData({ ...formData, area: e.target.value })}
                 className={`w-full bg-white border ${
@@ -237,7 +317,7 @@ export default function AddressPage() {
               </label>
               <input
                 type="text"
-                placeholder="e.g. Kochi"
+                placeholder="City"
                 value={formData.city}
                 onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                 className={`w-full bg-white border ${
@@ -247,20 +327,43 @@ export default function AddressPage() {
               {errors.city && <p className="text-xs text-[#DC2626]">{errors.city}</p>}
             </div>
 
-            {/* State */}
+            {/* State (Dropdown with 28 States & 8 Union Territories) */}
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-[#111111] uppercase tracking-wider block">
                 STATE *
               </label>
-              <input
-                type="text"
-                placeholder="e.g. Kerala"
-                value={formData.state}
-                onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                className={`w-full bg-white border ${
-                  errors.state ? 'border-[#DC2626]' : 'border-[#EAEAEA]'
-                } text-[#111111] text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-[#111111]`}
-              />
+              <div className="relative">
+                <select
+                  value={formData.state}
+                  onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                  className={`w-full bg-white border ${
+                    errors.state ? 'border-[#DC2626]' : 'border-[#EAEAEA]'
+                  } text-[#111111] text-sm rounded-xl px-4 py-3 appearance-none focus:outline-none focus:border-[#111111] pr-10 cursor-pointer ${
+                    !formData.state ? 'text-[#888888]' : 'text-[#111111]'
+                  }`}
+                >
+                  <option value="" disabled hidden>
+                    Select State
+                  </option>
+                  <optgroup label="STATES">
+                    {INDIAN_STATES.map((st) => (
+                      <option key={st} value={st} className="text-[#111111]">
+                        {st}
+                      </option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="UNION TERRITORIES">
+                    {INDIAN_UTS.map((ut) => (
+                      <option key={ut} value={ut} className="text-[#111111]">
+                        {ut}
+                      </option>
+                    ))}
+                  </optgroup>
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#111111]">
+                  <ChevronDown className="w-4 h-4 text-[#666666]" />
+                </div>
+              </div>
               {errors.state && <p className="text-xs text-[#DC2626]">{errors.state}</p>}
             </div>
 
@@ -271,7 +374,7 @@ export default function AddressPage() {
               </label>
               <input
                 type="text"
-                placeholder="e.g. 682001"
+                placeholder="Pincode"
                 maxLength={6}
                 value={formData.pincode}
                 onChange={(e) => setFormData({ ...formData, pincode: e.target.value })}
@@ -289,7 +392,7 @@ export default function AddressPage() {
               </label>
               <input
                 type="text"
-                placeholder="e.g. Near Metro Station / Clock Tower"
+                placeholder="Landmark"
                 value={formData.landmark}
                 onChange={(e) => setFormData({ ...formData, landmark: e.target.value })}
                 className="w-full bg-white border border-[#EAEAEA] text-[#111111] text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-[#111111]"

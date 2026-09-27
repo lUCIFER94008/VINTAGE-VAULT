@@ -4,6 +4,7 @@ export interface IAddressDocument extends Document {
   userId: string;
   fullName: string;
   phone: string;
+  additionalPhone?: string;
   house: string;
   street: string;
   area: string;
@@ -21,6 +22,7 @@ const AddressSchema = new Schema<IAddressDocument>(
     userId: { type: String, required: true, index: true },
     fullName: { type: String, required: true, trim: true },
     phone: { type: String, required: true, trim: true },
+    additionalPhone: { type: String, default: '', trim: true },
     house: { type: String, required: true, trim: true },
     street: { type: String, required: true, trim: true },
     area: { type: String, required: true, trim: true },

@@ -9,7 +9,7 @@ import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
 import WhatsAppButton from '@/components/WhatsAppButton';
-import { formatCurrency } from '@/lib/whatsapp';
+import { formatCurrency, formatPhoneNumber } from '@/lib/whatsapp';
 import { MapPin, ShoppingBag, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import { Address } from '@/types';
 
@@ -66,6 +66,7 @@ export default function OrderSummaryPage() {
           items: orderItems,
           customerName: address.fullName,
           phone: address.phone,
+          additionalPhone: address.additionalPhone || '',
           address: `${address.house}, ${address.street}, ${address.area}`,
           city: address.city,
           state: address.state,
@@ -180,14 +181,21 @@ export default function OrderSummaryPage() {
 
               <div className="text-xs text-[#111111] space-y-1">
                 <p className="font-bold text-[#111111] text-sm">{address.fullName}</p>
-                <p className="text-[#666666] font-mono">Phone: {address.phone}</p>
-                <p className="pt-1 text-[#666666]">
+                <p className="text-[#666666] font-mono">{formatPhoneNumber(address.phone)}</p>
+                {address.additionalPhone && (
+                  <p className="text-[#666666] font-mono">
+                    Additional: {formatPhoneNumber(address.additionalPhone)}
+                  </p>
+                )}
+                <p className="pt-2 text-[#666666]">
                   {address.house}, {address.street}, {address.area}
                 </p>
                 <p className="text-[#666666]">
                   {address.city}, {address.state} - {address.pincode}
                 </p>
-                {address.landmark && <p className="text-[#888888]">Landmark: {address.landmark}</p>}
+                {address.landmark && (
+                  <p className="pt-1 text-[#888888]">{address.landmark}</p>
+                )}
               </div>
             </div>
           </div>

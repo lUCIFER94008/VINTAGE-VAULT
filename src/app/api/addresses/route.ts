@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { fullName, phone, house, street, area, city, state, pincode, landmark, isDefault } = body;
+    const { fullName, phone, additionalPhone, house, street, area, city, state, pincode, landmark, isDefault } = body;
 
     if (!fullName || !phone || !house || !street || !area || !city || !state || !pincode) {
       return NextResponse.json(
@@ -60,6 +60,7 @@ export async function POST(req: NextRequest) {
       userId: user.userId,
       fullName,
       phone,
+      additionalPhone: additionalPhone || '',
       house,
       street,
       area,

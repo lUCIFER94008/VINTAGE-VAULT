@@ -160,6 +160,9 @@ export default function AdminOrderDetailsPage({ params }: { params: Promise<{ id
               <div className="text-xs text-[#666666] space-y-1 pt-1">
                 <p className="font-bold text-[#111111] text-sm">{order.customerName}</p>
                 <p className="font-mono text-[#666666]">Phone: {order.phone}</p>
+                {order.additionalPhone && (
+                  <p className="font-mono text-[#666666]">Additional Phone: {order.additionalPhone}</p>
+                )}
                 <p className="text-[#888888]">WhatsApp Status: {order.whatsappSent ? 'Message Generated' : 'Pending'}</p>
               </div>
             </div>

@@ -5,8 +5,9 @@ export const dynamic = 'force-dynamic';
 import React, { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
-import { MapPin, Plus, Trash2, CheckCircle2 } from 'lucide-react';
+import { MapPin, Plus, Trash2, CheckCircle2, ChevronDown } from 'lucide-react';
 import { Address } from '@/types';
+import { INDIAN_STATES, INDIAN_UTS } from '@/lib/constants';
 
 export default function AccountAddressesPage() {
   const { user, updateUserAddresses } = useAuth();
@@ -16,6 +17,7 @@ export default function AccountAddressesPage() {
   const [formData, setFormData] = useState<Address>({
     fullName: user?.name || '',
     phone: user?.phone || '',
+    additionalPhone: '',
     house: '',
     street: '',
     area: '',
@@ -29,8 +31,13 @@ export default function AccountAddressesPage() {
 
   const handleAddAddress = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.fullName || !formData.phone || !formData.house || !formData.city || !formData.pincode) {
+    if (!formData.fullName || !formData.phone || !formData.house || !formData.city || !formData.state || !formData.pincode) {
       showToast('Please fill in required fields.', 'error');
+      return;
+    }
+
+    if (!/^\d{6}$/.test(formData.pincode.trim())) {
+      showToast('Please enter a valid 6-digit pincode.', 'error');
       return;
     }
 
@@ -41,6 +48,7 @@ export default function AccountAddressesPage() {
     setFormData({
       fullName: user?.name || '',
       phone: user?.phone || '',
+      additionalPhone: '',
       house: '',
       street: '',
       area: '',
@@ -99,6 +107,13 @@ export default function AccountAddressesPage() {
                 required
               />
               <input
+                type="tel"
+                placeholder="Additional Phone (Optional)"
+                value={formData.additionalPhone || ''}
+                onChange={(e) => setFormData({ ...formData, additionalPhone: e.target.value })}
+                className="bg-white border border-[#EAEAEA] text-[#111111] rounded-xl p-3 focus:outline-none focus:border-[#111111] sm:col-span-2"
+              />
+              <input
                 type="text"
                 placeholder="House / Building No. *"
                 value={formData.house}
@@ -130,17 +145,37 @@ export default function AccountAddressesPage() {
                 className="bg-white border border-[#EAEAEA] text-[#111111] rounded-xl p-3 focus:outline-none focus:border-[#111111]"
                 required
               />
-              <input
-                type="text"
-                placeholder="State *"
-                value={formData.state}
-                onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                className="bg-white border border-[#EAEAEA] text-[#111111] rounded-xl p-3 focus:outline-none focus:border-[#111111]"
-                required
-              />
+              <div className="relative">
+                <select
+                  value={formData.state}
+                  onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                  className="w-full bg-white border border-[#EAEAEA] text-[#111111] rounded-xl p-3 appearance-none focus:outline-none focus:border-[#111111] pr-8 cursor-pointer"
+                  required
+                >
+                  <option value="" disabled hidden>
+                    Select State *
+                  </option>
+                  <optgroup label="STATES">
+                    {INDIAN_STATES.map((st) => (
+                      <option key={st} value={st}>
+                        {st}
+                      </option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="UNION TERRITORIES">
+                    {INDIAN_UTS.map((ut) => (
+                      <option key={ut} value={ut}>
+                        {ut}
+                      </option>
+                    ))}
+                  </optgroup>
+                </select>
+                <ChevronDown className="w-4 h-4 text-[#666666] absolute right-3 top-3.5 pointer-events-none" />
+              </div>
               <input
                 type="text"
                 placeholder="Pincode (6 digits) *"
+                maxLength={6}
                 value={formData.pincode}
                 onChange={(e) => setFormData({ ...formData, pincode: e.target.value })}
                 className="bg-white border border-[#EAEAEA] text-[#111111] rounded-xl p-3 focus:outline-none font-mono focus:border-[#111111]"
@@ -180,7 +215,10 @@ export default function AccountAddressesPage() {
                 <div className="flex justify-between items-start">
                   <div>
                     <h3 className="font-bold text-[#111111] text-base">{addr.fullName}</h3>
-                    <p className="text-xs text-[#666666] font-mono mt-0.5">{addr.phone}</p>
+                    <p className="text-xs text-[#666666] font-mono mt-0.5">Phone: {addr.phone}</p>
+                    {addr.additionalPhone && (
+                      <p className="text-xs text-[#666666] font-mono">Additional Phone: {addr.additionalPhone}</p>
+                    )}
                   </div>
                   <button
                     onClick={() => handleDeleteAddress(idx)}
