@@ -28,7 +28,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                     <img
                       src="https://res.cloudinary.com/dpmpefw2p/image/upload/v1790498090/WhatsApp_Image_2026-09-27_at_10.45.42_AM_lygban.png"
                       alt="VINTAGE VAULT Logo"
-                      className="w-10 h-10 object-contain rounded-md border border-[#EAEAEA]"
+                      className="w-[38px] h-[38px] sm:w-[46px] sm:h-[46px] object-cover rounded-full overflow-hidden shrink-0 border border-[#EAEAEA] shadow-sm"
                     />
                     <span className="font-black text-xl tracking-tighter uppercase text-[#111111]">VINTAGE VAULT</span>
                   </div>

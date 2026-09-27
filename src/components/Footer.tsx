@@ -62,7 +62,7 @@ export default function Footer() {
               <img
                 src="https://res.cloudinary.com/dpmpefw2p/image/upload/v1790498090/WhatsApp_Image_2026-09-27_at_10.45.42_AM_lygban.png"
                 alt="VINTAGE VAULT Logo"
-                className="w-9 h-9 object-contain rounded-md border border-[#EAEAEA] shrink-0"
+                className="w-[42px] h-[42px] object-cover rounded-full overflow-hidden shrink-0 border border-[#EAEAEA] shadow-sm"
               />
               <span className="text-2xl font-black tracking-tighter text-[#111111] uppercase group-hover:text-zinc-600 transition-colors">
                 VINTAGE VAULT

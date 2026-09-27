@@ -65,7 +65,7 @@ export default function Navbar() {
               <img
                 src="https://res.cloudinary.com/dpmpefw2p/image/upload/v1790498090/WhatsApp_Image_2026-09-27_at_10.45.42_AM_lygban.png"
                 alt="VINTAGE VAULT Logo"
-                className="w-10 h-10 sm:w-11 sm:h-11 object-contain rounded-md shrink-0 border border-[#EAEAEA]"
+                className="w-[38px] h-[38px] sm:w-[46px] sm:h-[46px] object-cover rounded-full overflow-hidden shrink-0 border border-[#EAEAEA] shadow-sm"
               />
               <div className="flex flex-col items-start">
                 <span className="text-xl sm:text-2xl font-black tracking-tighter uppercase text-[#111111] group-hover:text-zinc-600 transition-colors leading-none">
@@ -192,7 +192,7 @@ export default function Navbar() {
                   <img
                     src="https://res.cloudinary.com/dpmpefw2p/image/upload/v1790498090/WhatsApp_Image_2026-09-27_at_10.45.42_AM_lygban.png"
                     alt="VINTAGE VAULT Logo"
-                    className="w-8 h-8 object-contain rounded-md shrink-0 border border-[#EAEAEA]"
+                    className="w-[38px] h-[38px] object-cover rounded-full overflow-hidden shrink-0 border border-[#EAEAEA] shadow-sm"
                   />
                   <span className="text-lg font-black tracking-tight uppercase text-[#111111]">VINTAGE VAULT</span>
                 </div>
