@@ -544,15 +544,15 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             )}
 
             {activeTab === 'delivery' && (
-              <div className="space-y-4">
-                <h3 className="font-bold text-[#111111] text-base uppercase">SHIPPING INFORMATION</h3>
-                <p>
-                  Orders are processed and dispatched within 24 hours of WhatsApp confirmation. Delivery typically takes 2–5 business days depending on location.
-                </p>
-                <h4 className="font-bold text-[#111111] text-sm uppercase pt-2">RETURNS & EXCHANGES</h4>
-                <p>
-                  We accept size replacements and exchanges within 7 days of delivery. Products must be unwashed and unworn with original tags attached.
-                </p>
+              <div className="flex flex-col items-center justify-center py-2">
+                <div className="w-full max-w-lg mx-auto overflow-hidden rounded-2xl border border-[#EAEAEA] shadow-sm bg-white">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/images/return-policy-poster.jpg"
+                    alt="VINTAGE VAULT Return and Replacement Policy"
+                    className="w-full h-auto object-contain block rounded-2xl"
+                  />
+                </div>
               </div>
             )}
 
