@@ -544,14 +544,65 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             )}
 
             {activeTab === 'delivery' && (
-              <div className="flex flex-col items-center justify-center py-2">
-                <div className="w-full max-w-lg mx-auto overflow-hidden rounded-2xl border border-[#EAEAEA] shadow-sm bg-white">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src="/images/return-policy-poster.jpg"
-                    alt="VINTAGE VAULT Return and Replacement Policy"
-                    className="w-full h-auto object-contain block rounded-2xl"
-                  />
+              <div className="space-y-6 max-w-3xl mx-auto py-2">
+                {/* Header */}
+                <div className="border-b border-[#EAEAEA] pb-4">
+                  <h3 className="text-xl sm:text-2xl font-black text-[#111111] uppercase tracking-tight">
+                    RETURN & REPLACEMENT POLICY
+                  </h3>
+                  <p className="text-sm font-semibold text-[#111111] mt-2">
+                    Received a damaged or defective product?
+                  </p>
+                </div>
+
+                {/* Main Bullet Points */}
+                <ul className="space-y-4 text-xs sm:text-sm text-[#444444] leading-relaxed">
+                  <li className="flex items-start gap-3">
+                    <span className="text-[#111111] font-bold text-base leading-none select-none">•</span>
+                    <span>
+                      A continuous <strong className="font-extrabold text-[#111111] underline decoration-1 underline-offset-2">UNBOXING VIDEO</strong> is mandatory.
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-[#111111] font-bold text-base leading-none select-none">•</span>
+                    <span>
+                      Start recording before opening the package and continue until the product is fully revealed.
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-[#111111] font-bold text-base leading-none select-none">•</span>
+                    <span>
+                      Make sure the package, product and any damage are clearly visible.
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-[#111111] font-bold text-base leading-none select-none">•</span>
+                    <span>
+                      Damage-related return/replacement requests without a proper unboxing video will <strong className="font-black text-[#111111] bg-[#F3F3F3] px-1.5 py-0.5 rounded border border-[#E0E0E0] uppercase tracking-wide">NOT be accepted</strong>.
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-[#111111] font-bold text-base leading-none select-none">•</span>
+                    <span>
+                      Report any damage immediately after delivery.
+                    </span>
+                  </li>
+                </ul>
+
+                {/* Distinct IMPORTANT Subsection Callout */}
+                <div className="p-4 sm:p-5 rounded-2xl bg-[#F8F8F8] border border-[#EAEAEA] space-y-2 mt-6">
+                  <h4 className="text-xs font-black uppercase tracking-widest text-[#111111] flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#111111]"></span>
+                    <span>IMPORTANT</span>
+                  </h4>
+                  <ul className="space-y-2 text-xs sm:text-sm text-[#444444]">
+                    <li className="flex items-start gap-3">
+                      <span className="text-[#111111] font-bold text-base leading-none select-none">•</span>
+                      <span>
+                        Please record your unboxing video before using or removing tags from the product.
+                      </span>
+                    </li>
+                  </ul>
                 </div>
               </div>
             )}
