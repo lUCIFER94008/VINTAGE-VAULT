@@ -1,20 +1,20 @@
 export const INITIAL_CATEGORIES = [
   {
-    name: '5-Sleeve Jerseys',
+    name: '5-Sleeve',
     slug: '5-sleeve-jerseys',
     description: 'Oversized heavy-weight streetwear 5-sleeve boxy jerseys.',
     image: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=800&q=80',
     isActive: true,
   },
   {
-    name: 'Jeans',
-    slug: 'jeans',
+    name: 'Baggy',
+    slug: 'baggy',
     description: 'Premium raw denim, vintage washed baggy & cargo jeans.',
     image: 'https://images.unsplash.com/photo-1542272604-780c96856592?auto=format&fit=crop&w=800&q=80',
     isActive: true,
   },
   {
-    name: 'Full-Sleeve Shirts',
+    name: 'Full Sleeve',
     slug: 'full-sleeve-shirts',
     description: 'Relaxed fit drop-shoulder woven & flannel shirts.',
     image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=800&q=80',
@@ -28,17 +28,38 @@ export const INITIAL_CATEGORIES = [
     isActive: true,
   },
   {
-    name: 'Caps',
-    slug: 'caps',
+    name: 'Headwear',
+    slug: 'headwear',
     description: 'Unstructured dad hats, 5-panel caps & vintage snapbacks.',
     image: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?auto=format&fit=crop&w=800&q=80',
     isActive: true,
   },
   {
-    name: 'Glasses',
-    slug: 'glasses',
+    name: 'Accessories',
+    slug: 'accessories',
     description: 'Retro acetate sunglasses & anti-blue optical specs.',
     image: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=800&q=80',
+    isActive: true,
+  },
+  {
+    name: 'Shorts',
+    slug: 'shorts',
+    description: 'Oversized heavyweight streetwear shorts.',
+    image: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=800&q=80',
+    isActive: true,
+  },
+  {
+    name: 'T-Shirts',
+    slug: 't-shirts',
+    description: 'Graphic tees, boxy fit streetwear t-shirts.',
+    image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80',
+    isActive: true,
+  },
+  {
+    name: 'Track Pant',
+    slug: 'track-pant',
+    description: 'Relaxed fit heavyweight track pants & joggers.',
+    image: 'https://images.unsplash.com/photo-1552902865-b72c031ac5ea?auto=format&fit=crop&w=800&q=80',
     isActive: true,
   },
 ];
@@ -172,7 +193,7 @@ export const INITIAL_PRODUCTS = [
   {
     name: 'Raw Acid Wash Baggy Jeans',
     slug: 'raw-acid-wash-baggy-jeans',
-    category: 'jeans',
+    category: 'baggy',
     description: '14oz heavy raw indigo denim with custom vintage acid wash treatment, wide leg opening, and embossed leather patch.',
     price: 1199,
     originalPrice: 2399,
@@ -193,7 +214,7 @@ export const INITIAL_PRODUCTS = [
   {
     name: 'Multi-Pocket Tactical Cargo Jeans',
     slug: 'multi-pocket-tactical-cargo-jeans',
-    category: 'jeans',
+    category: 'baggy',
     description: 'Relaxed fit cargo denim featuring 6 utility pockets, heavy duty antique zippers, and drawcord hem adjustments.',
     price: 1299,
     originalPrice: 2599,
@@ -213,7 +234,7 @@ export const INITIAL_PRODUCTS = [
   {
     name: 'Vintage Destroyed Distressed Denim',
     slug: 'vintage-destroyed-distressed-denim',
-    category: 'jeans',
+    category: 'baggy',
     description: 'Hand-distressed knee abrasions with internal mesh backing for comfortable street wear style.',
     price: 1099,
     originalPrice: 2199,
@@ -233,7 +254,7 @@ export const INITIAL_PRODUCTS = [
   {
     name: 'Triple Stitch Wide-Leg Carpenter Jeans',
     slug: 'triple-stitch-wide-leg-carpenter-jeans',
-    category: 'jeans',
+    category: 'baggy',
     description: 'Workwear inspired carpenter jeans with hammer loop, reinforced knee panels, and contrast triple stitching.',
     price: 1249,
     originalPrice: 2499,
@@ -253,7 +274,7 @@ export const INITIAL_PRODUCTS = [
   {
     name: 'Obsidian Flare Stacked Denim',
     slug: 'obsidian-flare-stacked-denim',
-    category: 'jeans',
+    category: 'baggy',
     description: 'Slender top cut with dramatic stacked ankle flares and custom branded hardware buttons.',
     price: 1399,
     originalPrice: 2799,
@@ -273,7 +294,7 @@ export const INITIAL_PRODUCTS = [
   {
     name: 'Heritage Straight Fit Denim',
     slug: 'heritage-straight-fit-denim',
-    category: 'jeans',
+    category: 'baggy',
     description: 'Classic 90s silhouette straight cut denim jeans designed for timeless versatility.',
     price: 999,
     originalPrice: 1999,
@@ -540,7 +561,7 @@ export const INITIAL_PRODUCTS = [
   {
     name: 'Vintage Distressed Wash Dad Cap',
     slug: 'vintage-distressed-wash-dad-cap',
-    category: 'caps',
+    category: 'headwear',
     description: 'Unstructured 6-panel washed twill dad hat with vintage metal buckle strap back and subtle VV embroidery.',
     price: 499,
     originalPrice: 999,
@@ -561,7 +582,7 @@ export const INITIAL_PRODUCTS = [
   {
     name: 'Streetwear 5-Panel Camp Cap',
     slug: 'streetwear-5-panel-camp-cap',
-    category: 'caps',
+    category: 'headwear',
     description: 'Flat visor 5-panel cap made from water-resistant nylon fabric with reflective logo front patch.',
     price: 549,
     originalPrice: 1099,
@@ -581,7 +602,7 @@ export const INITIAL_PRODUCTS = [
   {
     name: 'Retro Trucker Mesh Snapback',
     slug: 'retro-trucker-mesh-snapback',
-    category: 'caps',
+    category: 'headwear',
     description: 'Classic foam front trucker hat with mesh ventilation panels and 3D foam puff print graphic.',
     price: 449,
     originalPrice: 899,
@@ -601,7 +622,7 @@ export const INITIAL_PRODUCTS = [
   {
     name: 'Minimalist Corduroy Snapback',
     slug: 'minimalist-corduroy-snapback',
-    category: 'caps',
+    category: 'headwear',
     description: 'Thick wale corduroy structured crown cap with flat brim and brass eyelets.',
     price: 599,
     originalPrice: 1199,
@@ -621,7 +642,7 @@ export const INITIAL_PRODUCTS = [
   {
     name: 'Heavy Knit Ribbed Beanie',
     slug: 'heavy-knit-ribbed-beanie',
-    category: 'caps',
+    category: 'headwear',
     description: 'Double layer soft acrylic knit beanie featuring a turn-up cuff and woven branded flag label.',
     price: 399,
     originalPrice: 799,
@@ -663,7 +684,7 @@ export const INITIAL_PRODUCTS = [
   {
     name: 'Cyber Vintage Acetate Sunglasses',
     slug: 'cyber-vintage-acetate-sunglasses',
-    category: 'glasses',
+    category: 'accessories',
     description: 'Thick handcrafted acetate rectangular frame with UV400 dark tint lenses and gold metal temple rivets.',
     price: 899,
     originalPrice: 1799,
@@ -684,7 +705,7 @@ export const INITIAL_PRODUCTS = [
   {
     name: 'Retro Oval Metal Frame Specs',
     slug: 'retro-oval-metal-frame-specs',
-    category: 'glasses',
+    category: 'accessories',
     description: 'Ultra-lightweight stainless steel slim oval frame with clear blue-light filtering lenses.',
     price: 799,
     originalPrice: 1599,
@@ -704,7 +725,7 @@ export const INITIAL_PRODUCTS = [
   {
     name: 'Y2K Frameless Shield Sunglasses',
     slug: 'y2k-frameless-shield-sunglasses',
-    category: 'glasses',
+    category: 'accessories',
     description: 'Futuristic wide wrap-around rimless shield lenses with chrome arm detailing.',
     price: 949,
     originalPrice: 1899,
@@ -724,7 +745,7 @@ export const INITIAL_PRODUCTS = [
   {
     name: 'Classic Wayfarer Polarized Shades',
     slug: 'classic-wayfarer-polarized-shades',
-    category: 'glasses',
+    category: 'accessories',
     description: 'Iconic shape polarized lenses offering 100% UVA/UVB protection with matte rubber finish frames.',
     price: 849,
     originalPrice: 1699,
@@ -744,7 +765,7 @@ export const INITIAL_PRODUCTS = [
   {
     name: 'Hexagonal Geometric Clear Specs',
     slug: 'hexagonal-geometric-clear-specs',
-    category: 'glasses',
+    category: 'accessories',
     description: 'Sharp modern hexagonal lens outline with adjustable silicone nose pads for all day comfort.',
     price: 749,
     originalPrice: 1499,

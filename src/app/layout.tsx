@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'VINTAGE VAULT | Timeless Style',
   description:
-    'Premium 5-Sleeve Jerseys, Vintage Raw Jeans & Everyday Streetwear Essentials.',
+    'Premium 5-Sleeve Jerseys, Baggy Denim & Everyday Streetwear Essentials.',
   icons: {
     icon: 'https://res.cloudinary.com/dpmpefw2p/image/upload/v1790498090/WhatsApp_Image_2026-09-27_at_10.45.42_AM_lygban.png',
     shortcut: 'https://res.cloudinary.com/dpmpefw2p/image/upload/v1790498090/WhatsApp_Image_2026-09-27_at_10.45.42_AM_lygban.png',

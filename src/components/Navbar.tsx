@@ -17,17 +17,25 @@ export default function Navbar() {
   const { wishlistCount } = useWishlist();
   const { user } = useAuth();
 
-  const navLinks = [
+  const mainNavLinks = [
     { name: 'Home', href: '/' },
     { name: '5-Sleeve', href: '/category/5-sleeve-jerseys' },
-    { name: 'Jeans', href: '/category/jeans' },
+    { name: 'Baggy', href: '/category/baggy' },
     { name: 'Full Sleeve', href: '/category/full-sleeve-shirts' },
     { name: 'Socks', href: '/category/socks' },
-    { name: 'Caps', href: '/category/caps' },
-    { name: 'Glasses', href: '/category/glasses' },
+    { name: 'Headwear', href: '/category/headwear' },
+    { name: 'Accessories', href: '/category/accessories' },
+  ];
+
+  const moreNavLinks = [
+    { name: 'Shorts', href: '/category/shorts' },
+    { name: 'T-Shirts', href: '/category/t-shirts' },
+    { name: 'Track Pant', href: '/category/track-pant' },
     { name: 'New Arrivals', href: '/products?newArrival=true' },
     { name: 'Offers', href: '/products?featured=true' },
   ];
+
+  const allNavLinks = [...mainNavLinks, ...moreNavLinks];
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,8 +86,8 @@ export default function Navbar() {
             </Link>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden lg:flex items-center space-x-6 text-sm font-medium">
-              {navLinks.map((link) => {
+            <nav className="hidden lg:flex items-center space-x-5 text-sm font-medium">
+              {mainNavLinks.map((link) => {
                 const isActive = pathname === link.href;
                 return (
                   <Link
@@ -93,6 +101,37 @@ export default function Navbar() {
                   </Link>
                 );
               })}
+
+              {/* More Dropdown */}
+              <div className="relative group py-2">
+                <button
+                  className="flex items-center gap-1 text-[#666666] hover:text-[#111111] transition-colors tracking-wide py-1"
+                  aria-expanded="false"
+                  aria-haspopup="true"
+                >
+                  <span>More</span>
+                  <svg className="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                <div className="absolute right-0 top-full hidden group-hover:block w-48 bg-white border border-[#EAEAEA] rounded-xl shadow-xl py-2 z-50 animate-fadeIn">
+                  {moreNavLinks.map((link) => {
+                    const isActive = pathname === link.href;
+                    return (
+                      <Link
+                        key={link.name}
+                        href={link.href}
+                        className={`block px-4 py-2 text-sm transition-colors ${
+                          isActive ? 'bg-[#F8F8F8] font-bold text-[#111111]' : 'text-[#666666] hover:bg-[#F8F8F8] hover:text-[#111111]'
+                        }`}
+                      >
+                        {link.name}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
             </nav>
 
             {/* Right Action Icons */}
@@ -154,7 +193,7 @@ export default function Navbar() {
               <form onSubmit={handleSearchSubmit} className="relative flex items-center">
                 <input
                   type="text"
-                  placeholder="Search jerseys, jeans, caps, glasses..."
+                  placeholder="Search jerseys, baggy, headwear, accessories..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full bg-[#F8F8F8] border border-[#EAEAEA] text-[#111111] placeholder-[#888888] rounded-lg px-4 py-3 pl-11 text-sm focus:outline-none focus:border-[#111111]"
@@ -184,7 +223,7 @@ export default function Navbar() {
           />
 
           {/* Drawer Content */}
-          <div className="relative w-4/5 max-w-xs bg-white text-[#111111] h-full flex flex-col justify-between p-6 z-10 border-r border-[#EAEAEA] shadow-2xl">
+          <div className="relative w-4/5 max-w-xs bg-white text-[#111111] h-full flex flex-col justify-between p-6 z-10 border-r border-[#EAEAEA] shadow-2xl overflow-y-auto">
             <div>
               <div className="flex items-center justify-between pb-6 border-b border-[#EAEAEA]">
                 <div className="flex items-center gap-2.5">
@@ -204,13 +243,13 @@ export default function Navbar() {
                 </button>
               </div>
 
-              <nav className="mt-6 flex flex-col space-y-4">
-                {navLinks.map((link) => (
+              <nav className="mt-6 flex flex-col space-y-3">
+                {allNavLinks.map((link) => (
                   <Link
                     key={link.name}
                     href={link.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="text-base font-medium text-[#666666] hover:text-[#111111] transition-colors"
+                    className="text-base font-medium text-[#666666] hover:text-[#111111] transition-colors py-1"
                   >
                     {link.name}
                   </Link>

@@ -27,11 +27,14 @@ export default function AddProductPage() {
 
   const availableCategories = [
     { label: '5-Sleeve Jerseys', value: '5-sleeve-jerseys' },
-    { label: 'Jeans', value: 'jeans' },
+    { label: 'Baggy', value: 'baggy' },
     { label: 'Full-Sleeve Shirts', value: 'full-sleeve-shirts' },
     { label: 'Socks', value: 'socks' },
-    { label: 'Caps', value: 'caps' },
-    { label: 'Glasses', value: 'glasses' },
+    { label: 'Headwear', value: 'headwear' },
+    { label: 'Accessories', value: 'accessories' },
+    { label: 'Shorts', value: 'shorts' },
+    { label: 'T-Shirts', value: 't-shirts' },
+    { label: 'Track Pant', value: 'track-pant' },
   ];
 
   const allPossibleSizes = ['S', 'M', 'L', 'XL', 'XXL', '28', '30', '32', '34', '36', 'Free Size'];

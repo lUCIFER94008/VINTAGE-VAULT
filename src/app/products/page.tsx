@@ -26,12 +26,15 @@ function ProductsContent() {
 
   const categories = [
     { name: 'All Categories', slug: 'all' },
-    { name: '5-Sleeve Jerseys', slug: '5-sleeve-jerseys' },
-    { name: 'Jeans', slug: 'jeans' },
-    { name: 'Full-Sleeve Shirts', slug: 'full-sleeve-shirts' },
+    { name: '5-Sleeve', slug: '5-sleeve-jerseys' },
+    { name: 'Baggy', slug: 'baggy' },
+    { name: 'Full Sleeve', slug: 'full-sleeve-shirts' },
     { name: 'Socks', slug: 'socks' },
-    { name: 'Caps', slug: 'caps' },
-    { name: 'Glasses', slug: 'glasses' },
+    { name: 'Headwear', slug: 'headwear' },
+    { name: 'Accessories', slug: 'accessories' },
+    { name: 'Shorts', slug: 'shorts' },
+    { name: 'T-Shirts', slug: 't-shirts' },
+    { name: 'Track Pant', slug: 'track-pant' },
   ];
 
   const sizes = ['S', 'M', 'L', 'XL', 'XXL', '28', '30', '32', '34', '36', 'Free Size'];
@@ -220,7 +223,7 @@ function ProductsContent() {
               ALL PRODUCTS
             </h1>
             <p className="text-xs sm:text-sm text-[#666666] mt-2">
-              Explore our latest drop of heavyweight 5-sleeve jerseys, raw jeans, woven shirts & eyewear.
+              Explore our latest drop of heavyweight 5-sleeve jerseys, baggy denim, headwear, shorts & accessories.
             </p>
           </div>
 

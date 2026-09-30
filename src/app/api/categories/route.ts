@@ -3,10 +3,12 @@ import { connectToDatabase } from '@/lib/db';
 import { Category } from '@/lib/models/Category';
 import { Product } from '@/lib/models/Product';
 import { requireAdmin } from '@/lib/auth';
+import { ensureCategoryMigration } from '@/lib/categorySync';
 
 export async function GET() {
   try {
     await connectToDatabase();
+    await ensureCategoryMigration();
     const categories = await Category.find({ isActive: true }).sort({ name: 1 });
 
     // Count products per category & convert _id to string

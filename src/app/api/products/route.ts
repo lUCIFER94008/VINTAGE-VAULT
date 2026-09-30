@@ -4,13 +4,15 @@ import { connectToDatabase } from '@/lib/db';
 import { Product } from '@/lib/models/Product';
 import { Category } from '@/lib/models/Category';
 import { requireAdmin } from '@/lib/auth';
+import { ensureCategoryMigration } from '@/lib/categorySync';
 
 export async function GET(req: NextRequest) {
   try {
     await connectToDatabase();
+    await ensureCategoryMigration();
 
     const { searchParams } = new URL(req.url);
-    const category = searchParams.get('category');
+    let category = searchParams.get('category');
     const search = searchParams.get('search');
     const isFeatured = searchParams.get('featured');
     const isNewArrival = searchParams.get('newArrival');
@@ -29,6 +31,9 @@ export async function GET(req: NextRequest) {
     }
 
     if (category) {
+      if (category === 'jeans') category = 'baggy';
+      if (category === 'caps') category = 'headwear';
+      if (category === 'glasses') category = 'accessories';
       filter.category = category;
     }
 

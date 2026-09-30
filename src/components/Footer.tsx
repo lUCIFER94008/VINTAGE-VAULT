@@ -116,32 +116,47 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/category/5-sleeve-jerseys" className="hover:text-[#111111] transition-colors">
-                  5-Sleeve Jerseys
+                  5-Sleeve
                 </Link>
               </li>
               <li>
-                <Link href="/category/jeans" className="hover:text-[#111111] transition-colors">
-                  Jeans & Denim
+                <Link href="/category/baggy" className="hover:text-[#111111] transition-colors">
+                  Baggy
                 </Link>
               </li>
               <li>
                 <Link href="/category/full-sleeve-shirts" className="hover:text-[#111111] transition-colors">
-                  Full Sleeve Shirts
+                  Full Sleeve
                 </Link>
               </li>
               <li>
                 <Link href="/category/socks" className="hover:text-[#111111] transition-colors">
-                  Ribbed Socks
+                  Socks
                 </Link>
               </li>
               <li>
-                <Link href="/category/caps" className="hover:text-[#111111] transition-colors">
-                  Caps & Beanies
+                <Link href="/category/headwear" className="hover:text-[#111111] transition-colors">
+                  Headwear
                 </Link>
               </li>
               <li>
-                <Link href="/category/glasses" className="hover:text-[#111111] transition-colors">
-                  Eyewear & Glasses
+                <Link href="/category/accessories" className="hover:text-[#111111] transition-colors">
+                  Accessories
+                </Link>
+              </li>
+              <li>
+                <Link href="/category/shorts" className="hover:text-[#111111] transition-colors">
+                  Shorts
+                </Link>
+              </li>
+              <li>
+                <Link href="/category/t-shirts" className="hover:text-[#111111] transition-colors">
+                  T-Shirts
+                </Link>
+              </li>
+              <li>
+                <Link href="/category/track-pant" className="hover:text-[#111111] transition-colors">
+                  Track Pant
                 </Link>
               </li>
             </ul>

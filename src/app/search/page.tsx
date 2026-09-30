@@ -58,7 +58,7 @@ function SearchContent() {
           <form onSubmit={handleSearchSubmit} className="relative flex items-center">
             <input
               type="text"
-              placeholder="Search jerseys, jeans, caps, glasses..."
+              placeholder="Search jerseys, baggy, headwear, accessories, shorts..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className="w-full bg-[#F8F8F8] border border-[#EAEAEA] text-[#111111] placeholder-[#888888] rounded-2xl px-6 py-4 pl-14 text-base focus:outline-none focus:border-[#111111] shadow-sm"
@@ -78,7 +78,7 @@ function SearchContent() {
             <span className="text-xs font-bold text-[#888888] uppercase flex items-center gap-1">
               <Sparkles className="w-3.5 h-3.5 text-amber-500" /> SUGGESTIONS:
             </span>
-            {['jersey', 'jeans', 'flannel', 'caps', 'glasses', 'argentina'].map((term) => (
+            {['jersey', 'baggy', 'headwear', 'accessories', 'shorts', 't-shirts', 'track pant'].map((term) => (
               <button
                 key={term}
                 onClick={() => handleSuggestionClick(term)}
@@ -108,7 +108,7 @@ function SearchContent() {
             products={products}
             emptyMessage={
               query
-                ? `No products found matching "${query}". Try searching for jerseys, jeans, or caps.`
+                ? `No products found matching "${query}". Try searching for jerseys, baggy, or headwear.`
                 : 'Type something in the search box above to explore.'
             }
           />

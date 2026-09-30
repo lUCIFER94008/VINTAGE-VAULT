@@ -129,7 +129,7 @@ export default function HomePage() {
           </h1>
 
           <p className="max-w-2xl mx-auto text-base sm:text-xl text-[#666666] font-medium tracking-wide">
-            Premium 5-Sleeve Jerseys, Vintage Raw Jeans & Everyday Streetwear Essentials.
+            Premium 5-Sleeve Jerseys, Baggy Denim & Everyday Streetwear Essentials.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">

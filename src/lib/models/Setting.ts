@@ -14,7 +14,7 @@ export interface ISettingDocument extends Document {
 const SettingSchema = new Schema<ISettingDocument>(
   {
     storeName: { type: String, default: 'VINTAGE VAULT' },
-    storeDescription: { type: String, default: 'Timeless Style Always Wins. Premium Jerseys, Jeans & Everyday Essentials.' },
+    storeDescription: { type: String, default: 'Timeless Style Always Wins. Premium Jerseys, Baggy & Everyday Essentials.' },
     whatsappNumber: { type: String, default: '' },
     currency: { type: String, default: 'INR' },
     currencySymbol: { type: String, default: '₹' },
