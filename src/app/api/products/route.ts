@@ -34,6 +34,7 @@ export async function GET(req: NextRequest) {
       if (category === 'jeans') category = 'baggy';
       if (category === 'caps') category = 'headwear';
       if (category === 'glasses') category = 'accessories';
+      if (category === 'full-sleeve-shirts' || category === 'full-sleeve') category = 'full-sleeve-stripes';
       filter.category = category;
     }
 

@@ -21,7 +21,7 @@ export default function Navbar() {
     { name: 'Home', href: '/' },
     { name: '5-Sleeve', href: '/category/5-sleeve-jerseys' },
     { name: 'Baggy', href: '/category/baggy' },
-    { name: 'Full Sleeve', href: '/category/full-sleeve-shirts' },
+    { name: 'Full-Sleeve Stripes', href: '/category/full-sleeve-stripes' },
     { name: 'Socks', href: '/category/socks' },
     { name: 'Headwear', href: '/category/headwear' },
     { name: 'Accessories', href: '/category/accessories' },

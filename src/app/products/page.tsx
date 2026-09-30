@@ -28,7 +28,7 @@ function ProductsContent() {
     { name: 'All Categories', slug: 'all' },
     { name: '5-Sleeve', slug: '5-sleeve-jerseys' },
     { name: 'Baggy', slug: 'baggy' },
-    { name: 'Full Sleeve', slug: 'full-sleeve-shirts' },
+    { name: 'Full-Sleeve Stripes', slug: 'full-sleeve-stripes' },
     { name: 'Socks', slug: 'socks' },
     { name: 'Headwear', slug: 'headwear' },
     { name: 'Accessories', slug: 'accessories' },

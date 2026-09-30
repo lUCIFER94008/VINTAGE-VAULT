@@ -34,7 +34,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   const availableCategories = [
     { label: '5-Sleeve Jerseys', value: '5-sleeve-jerseys' },
     { label: 'Baggy', value: 'baggy' },
-    { label: 'Full-Sleeve Shirts', value: 'full-sleeve-shirts' },
+    { label: 'Full-Sleeve Stripes', value: 'full-sleeve-stripes' },
     { label: 'Socks', value: 'socks' },
     { label: 'Headwear', value: 'headwear' },
     { label: 'Accessories', value: 'accessories' },
@@ -54,7 +54,11 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
           const p = data.product;
           setProduct(p);
           setName(p.name);
-          setCategory(p.category);
+          let catVal = p.category || '';
+          if (catVal === 'full-sleeve-shirts' || catVal === 'full-sleeve' || catVal === 'Full Sleeve' || catVal === 'Full-Sleeve Shirts') {
+            catVal = 'full-sleeve-stripes';
+          }
+          setCategory(catVal);
           setDescription(p.description);
           setPrice(p.price.toString());
           setOriginalPrice(p.originalPrice.toString());

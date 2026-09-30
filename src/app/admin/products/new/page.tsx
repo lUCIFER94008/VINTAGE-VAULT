@@ -28,7 +28,7 @@ export default function AddProductPage() {
   const availableCategories = [
     { label: '5-Sleeve Jerseys', value: '5-sleeve-jerseys' },
     { label: 'Baggy', value: 'baggy' },
-    { label: 'Full-Sleeve Shirts', value: 'full-sleeve-shirts' },
+    { label: 'Full-Sleeve Stripes', value: 'full-sleeve-stripes' },
     { label: 'Socks', value: 'socks' },
     { label: 'Headwear', value: 'headwear' },
     { label: 'Accessories', value: 'accessories' },

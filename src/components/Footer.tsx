@@ -125,8 +125,8 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/category/full-sleeve-shirts" className="hover:text-[#111111] transition-colors">
-                  Full Sleeve
+                <Link href="/category/full-sleeve-stripes" className="hover:text-[#111111] transition-colors">
+                  Full-Sleeve Stripes
                 </Link>
               </li>
               <li>

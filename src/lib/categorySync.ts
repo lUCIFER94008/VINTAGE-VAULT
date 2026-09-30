@@ -15,9 +15,9 @@ export const ALL_CATEGORIES_CONFIG = [
     image: 'https://images.unsplash.com/photo-1542272604-780c96856592?auto=format&fit=crop&w=800&q=80',
   },
   {
-    name: 'Full Sleeve',
-    slug: 'full-sleeve-shirts',
-    description: 'Relaxed fit drop-shoulder woven & flannel shirts.',
+    name: 'Full-Sleeve Stripes',
+    slug: 'full-sleeve-stripes',
+    description: 'Relaxed fit drop-shoulder woven & striped shirts.',
     image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=800&q=80',
   },
   {
@@ -75,11 +75,19 @@ export async function ensureCategoryMigration() {
       { slug: 'glasses' },
       { $set: { name: 'Accessories', slug: 'accessories', description: 'Retro acetate sunglasses & anti-blue optical specs.' } }
     );
+    await Category.updateOne(
+      { $or: [{ slug: 'full-sleeve-shirts' }, { slug: 'full-sleeve' }] },
+      { $set: { name: 'Full-Sleeve Stripes', slug: 'full-sleeve-stripes', description: 'Relaxed fit drop-shoulder woven & striped shirts.' } }
+    );
 
     // 2. Migrate category fields on existing products
     await Product.updateMany({ category: 'jeans' }, { $set: { category: 'baggy' } });
     await Product.updateMany({ category: 'caps' }, { $set: { category: 'headwear' } });
     await Product.updateMany({ category: 'glasses' }, { $set: { category: 'accessories' } });
+    await Product.updateMany(
+      { $or: [{ category: 'full-sleeve-shirts' }, { category: 'full-sleeve' }, { category: 'Full Sleeve' }, { category: 'Full-Sleeve Shirts' }] },
+      { $set: { category: 'full-sleeve-stripes' } }
+    );
 
     // Also migrate if product category stored as name string
     await Product.updateMany({ category: 'Jeans' }, { $set: { category: 'baggy' } });

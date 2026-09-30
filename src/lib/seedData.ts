@@ -14,9 +14,9 @@ export const INITIAL_CATEGORIES = [
     isActive: true,
   },
   {
-    name: 'Full Sleeve',
-    slug: 'full-sleeve-shirts',
-    description: 'Relaxed fit drop-shoulder woven & flannel shirts.',
+    name: 'Full-Sleeve Stripes',
+    slug: 'full-sleeve-stripes',
+    description: 'Relaxed fit drop-shoulder woven & striped shirts.',
     image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=800&q=80',
     isActive: true,
   },
@@ -316,7 +316,7 @@ export const INITIAL_PRODUCTS = [
   {
     name: 'Heavy Flannel Oversized Plaid Shirt',
     slug: 'heavy-flannel-oversized-plaid-shirt',
-    category: 'full-sleeve-shirts',
+    category: 'full-sleeve-stripes',
     description: '320 GSM thick brush cotton flannel shirt with chest patch pockets and drop shoulder relaxed fit.',
     price: 899,
     originalPrice: 1799,
@@ -337,7 +337,7 @@ export const INITIAL_PRODUCTS = [
   {
     name: 'Vintage Corduroy Button-Down Overshirt',
     slug: 'vintage-corduroy-button-down-overshirt',
-    category: 'full-sleeve-shirts',
+    category: 'full-sleeve-stripes',
     description: 'Soft 8-wale cotton corduroy overshirt with custom tortoiseshell buttons.',
     price: 999,
     originalPrice: 1999,
@@ -357,7 +357,7 @@ export const INITIAL_PRODUCTS = [
   {
     name: 'Minimalist Cuban Collar Woven Shirt',
     slug: 'minimalist-cuban-collar-woven-shirt',
-    category: 'full-sleeve-shirts',
+    category: 'full-sleeve-stripes',
     description: 'Sleek matte texture breathable lyocell blend long sleeve shirt with camp collar.',
     price: 849,
     originalPrice: 1699,
@@ -377,7 +377,7 @@ export const INITIAL_PRODUCTS = [
   {
     name: 'Military Utility Double-Pocket Shirt',
     slug: 'military-utility-double-pocket-shirt',
-    category: 'full-sleeve-shirts',
+    category: 'full-sleeve-stripes',
     description: 'Durable cotton ripstop weave utility shirt with functional chest pockets and sleeve loops.',
     price: 899,
     originalPrice: 1799,
@@ -397,7 +397,7 @@ export const INITIAL_PRODUCTS = [
   {
     name: 'Vault Monogram Satin Bowling Shirt',
     slug: 'vault-monogram-satin-bowling-shirt',
-    category: 'full-sleeve-shirts',
+    category: 'full-sleeve-stripes',
     description: 'Silky smooth vintage satin feel shirt featuring tonal monogram embroidery along the hem.',
     price: 1099,
     originalPrice: 2199,
@@ -417,7 +417,7 @@ export const INITIAL_PRODUCTS = [
   {
     name: 'Raw Linen Relaxed Resort Shirt',
     slug: 'raw-linen-relaxed-resort-shirt',
-    category: 'full-sleeve-shirts',
+    category: 'full-sleeve-stripes',
     description: 'Lightweight pure French flax linen shirt ideal for hot summer layering.',
     price: 799,
     originalPrice: 1599,
