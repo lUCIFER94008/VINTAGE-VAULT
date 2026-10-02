@@ -5,11 +5,26 @@ import { Product } from '@/lib/models/Product';
 import { requireAdmin } from '@/lib/auth';
 import { ensureCategoryMigration } from '@/lib/categorySync';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+const CATEGORY_ORDER = [
+  '5-sleeve-jerseys',
+  'baggy',
+  'full-sleeve-stripes',
+  'socks',
+  'headwear',
+  'accessories',
+  'shorts',
+  't-shirts',
+  'track-pant',
+];
+
 export async function GET() {
   try {
     await connectToDatabase();
     await ensureCategoryMigration();
-    const categories = await Category.find({ isActive: true }).sort({ name: 1 });
+    const categories = await Category.find({ isActive: true });
 
     // Count products per category & convert _id to string
     const categoriesWithCounts = await Promise.all(
@@ -24,10 +39,26 @@ export async function GET() {
       })
     );
 
-    return NextResponse.json({
-      success: true,
-      categories: categoriesWithCounts,
+    // Sort according to target category order
+    categoriesWithCounts.sort((a, b) => {
+      const idxA = CATEGORY_ORDER.indexOf(a.slug);
+      const idxB = CATEGORY_ORDER.indexOf(b.slug);
+      const posA = idxA === -1 ? 99 : idxA;
+      const posB = idxB === -1 ? 99 : idxB;
+      return posA - posB;
     });
+
+    return NextResponse.json(
+      {
+        success: true,
+        categories: categoriesWithCounts,
+      },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        },
+      }
+    );
   } catch (error: any) {
     console.error('Get categories API error:', error);
     return NextResponse.json(

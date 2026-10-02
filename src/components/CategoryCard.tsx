@@ -13,22 +13,44 @@ interface CategoryCardProps {
 }
 
 export default function CategoryCard({ name, slug, image }: CategoryCardProps) {
+  const hasValidImage = Boolean(
+    image &&
+      typeof image === 'string' &&
+      image.trim() !== '' &&
+      !image.includes('unsplash.com') &&
+      !image.includes('pexels.com') &&
+      !image.includes('placeholder')
+  );
+
   return (
     <Link
       href={`/category/${slug}`}
-      className="group relative h-80 sm:h-96 rounded-3xl overflow-hidden bg-white border border-[#EAEAEA] flex flex-col justify-end p-6 transition-all duration-300 hover:border-zinc-400 hover:shadow-lg"
+      className="group relative h-80 sm:h-96 rounded-3xl overflow-hidden bg-[#F8F8F8] border border-[#EAEAEA] flex flex-col justify-end p-6 transition-all duration-300 hover:border-zinc-400 hover:shadow-lg"
     >
-      {/* Background Image */}
-      <Image
-        src={image}
-        alt={name}
-        fill
-        className="object-cover object-center transition-transform duration-700 group-hover:scale-105 opacity-90 group-hover:opacity-100"
-        unoptimized
-      />
-
-      {/* Gradient Overlay for Readable Text */}
-      <div className="absolute inset-0 bg-gradient-to-t from-white via-white/40 to-transparent" />
+      {/* Background Image or Neutral Minimal Empty Area */}
+      {hasValidImage ? (
+        <>
+          <Image
+            src={image}
+            alt={name}
+            fill
+            className="object-cover object-center transition-transform duration-700 group-hover:scale-105 opacity-90 group-hover:opacity-100"
+            unoptimized
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-white via-white/40 to-transparent" />
+        </>
+      ) : (
+        <div className="absolute inset-0 bg-gradient-to-b from-[#FAFAFA] to-[#F0F0F0] flex items-center justify-center p-6 text-center">
+          <div className="space-y-2">
+            <div className="w-14 h-14 rounded-2xl bg-white border border-[#EAEAEA] text-[#111111] font-black text-xl flex items-center justify-center mx-auto shadow-sm group-hover:scale-105 transition-transform">
+              {name.substring(0, 2).toUpperCase()}
+            </div>
+            <span className="text-[10px] font-bold tracking-widest text-[#888888] uppercase block">
+              VINTAGE VAULT
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Content */}
       <div className="relative z-10 flex items-end justify-between">

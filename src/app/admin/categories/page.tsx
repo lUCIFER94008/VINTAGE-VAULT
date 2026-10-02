@@ -101,11 +101,6 @@ export default function AdminCategoriesPage() {
       return;
     }
 
-    if (!imagePreview) {
-      showToast('Category image is required.', 'error');
-      return;
-    }
-
     let finalImageUrl = editingCategory?.image || '';
 
     // If new file selected, upload to Cloudinary
@@ -366,13 +361,27 @@ export default function AdminCategoriesPage() {
           >
             <div>
               {/* Category Image */}
-              <div className="relative h-44 w-full rounded-2xl overflow-hidden bg-[#F8F8F8] border border-[#EAEAEA] mb-3">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={cat.image || 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=800&q=80'}
-                  alt={cat.name}
-                  className="w-full h-full object-cover object-center"
-                />
+              <div className="relative h-44 w-full rounded-2xl overflow-hidden bg-[#F8F8F8] border border-[#EAEAEA] mb-3 flex items-center justify-center">
+                {cat.image &&
+                !cat.image.includes('unsplash.com') &&
+                !cat.image.includes('pexels.com') &&
+                !cat.image.includes('placeholder') ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
+                    src={cat.image}
+                    alt={cat.name}
+                    className="w-full h-full object-cover object-center"
+                  />
+                ) : (
+                  <div className="text-center p-4">
+                    <span className="text-xs font-bold text-[#888888] uppercase block">
+                      NO IMAGE UPLOADED
+                    </span>
+                    <span className="text-[10px] text-[#AAAAAA] mt-1 block">
+                      Upload Cloudinary image via Edit
+                    </span>
+                  </div>
+                )}
               </div>
 
               <div className="flex justify-between items-start">

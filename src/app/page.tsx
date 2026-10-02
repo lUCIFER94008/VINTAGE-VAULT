@@ -21,8 +21,8 @@ import { Product, Category } from '@/types';
 import { INITIAL_CATEGORIES, INITIAL_PRODUCTS } from '@/lib/seedData';
 
 export default function HomePage() {
-  const [categories, setCategories] = useState<Category[]>(INITIAL_CATEGORIES as any);
-  const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS as any);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
@@ -31,11 +31,11 @@ export default function HomePage() {
     setFetchError(null);
     try {
       const [prodRes, catRes] = await Promise.all([
-        fetch('/api/products').catch((err) => {
+        fetch('/api/products', { cache: 'no-store' }).catch((err) => {
           console.warn('Products fetch exception:', err);
           return null;
         }),
-        fetch('/api/categories').catch((err) => {
+        fetch('/api/categories', { cache: 'no-store' }).catch((err) => {
           console.warn('Categories fetch exception:', err);
           return null;
         }),
@@ -227,16 +227,32 @@ export default function HomePage() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {categories.map((cat, idx) => (
-            <CategoryCard
-              key={cat._id?.toString() || cat.slug || `cat-${idx}`}
-              name={cat.name}
-              slug={cat.slug}
-              image={cat.image || 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=800&q=80'}
-            />
-          ))}
-        </div>
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 9 }).map((_, i) => (
+              <div
+                key={i}
+                className="h-80 sm:h-96 rounded-3xl bg-[#F8F8F8] border border-[#EAEAEA] animate-pulse p-6 flex flex-col justify-end"
+              >
+                <div className="space-y-2">
+                  <div className="h-3 w-16 bg-[#EAEAEA] rounded" />
+                  <div className="h-6 w-36 bg-[#EAEAEA] rounded" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {categories.map((cat, idx) => (
+              <CategoryCard
+                key={cat._id?.toString() || cat.slug || `cat-${idx}`}
+                name={cat.name}
+                slug={cat.slug}
+                image={cat.image || ''}
+              />
+            ))}
+          </div>
+        )}
       </section>
 
       {/* SECTION 4 - TRENDING PRODUCTS */}

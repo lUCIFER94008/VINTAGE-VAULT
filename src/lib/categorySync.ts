@@ -3,58 +3,58 @@ import { Product } from '@/lib/models/Product';
 
 export const ALL_CATEGORIES_CONFIG = [
   {
-    name: '5-Sleeve',
+    name: '5-Sleeve Jerseys',
     slug: '5-sleeve-jerseys',
     description: 'Oversized heavy-weight streetwear 5-sleeve boxy jerseys.',
-    image: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=800&q=80',
+    image: '',
   },
   {
     name: 'Baggy',
     slug: 'baggy',
     description: 'Premium raw denim, vintage washed baggy & cargo jeans.',
-    image: 'https://images.unsplash.com/photo-1542272604-780c96856592?auto=format&fit=crop&w=800&q=80',
+    image: '',
   },
   {
     name: 'Full-Sleeve Stripes',
     slug: 'full-sleeve-stripes',
     description: 'Relaxed fit drop-shoulder woven & striped shirts.',
-    image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=800&q=80',
+    image: '',
   },
   {
     name: 'Socks',
     slug: 'socks',
     description: 'Ribbed vintage cotton crew socks with custom jacquard logos.',
-    image: 'https://images.unsplash.com/photo-1586350977771-b3b0abd50c82?auto=format&fit=crop&w=800&q=80',
+    image: '',
   },
   {
     name: 'Headwear',
     slug: 'headwear',
     description: 'Unstructured dad hats, 5-panel caps & vintage snapbacks.',
-    image: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?auto=format&fit=crop&w=800&q=80',
+    image: '',
   },
   {
     name: 'Accessories',
     slug: 'accessories',
     description: 'Retro acetate sunglasses & anti-blue optical specs.',
-    image: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=800&q=80',
+    image: '',
   },
   {
     name: 'Shorts',
     slug: 'shorts',
     description: 'Oversized heavyweight streetwear shorts.',
-    image: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=800&q=80',
+    image: '',
   },
   {
     name: 'T-Shirts',
     slug: 't-shirts',
     description: 'Graphic tees, boxy fit streetwear t-shirts.',
-    image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80',
+    image: '',
   },
   {
     name: 'Track Pant',
     slug: 'track-pant',
     description: 'Relaxed fit heavyweight track pants & joggers.',
-    image: 'https://images.unsplash.com/photo-1552902865-b72c031ac5ea?auto=format&fit=crop&w=800&q=80',
+    image: '',
   },
 ];
 
@@ -99,10 +99,35 @@ export async function ensureCategoryMigration() {
       const existing = await Category.findOne({ slug: cat.slug });
       if (!existing) {
         await Category.create({ ...cat, isActive: true });
-      } else if (existing.name !== cat.name) {
-        await Category.updateOne({ slug: cat.slug }, { $set: { name: cat.name } });
+      } else {
+        const updateDoc: any = {};
+        if (existing.name !== cat.name) updateDoc.name = cat.name;
+        // Purge fake/Unsplash/Pexels image URLs stored in DB
+        if (
+          existing.image &&
+          (existing.image.includes('unsplash.com') ||
+            existing.image.includes('pexels.com') ||
+            existing.image.includes('placeholder'))
+        ) {
+          updateDoc.image = '';
+        }
+        if (Object.keys(updateDoc).length > 0) {
+          await Category.updateOne({ slug: cat.slug }, { $set: updateDoc });
+        }
       }
     }
+
+    // 4. Also clean up any other categories that have fake unsplash/pexels images
+    await Category.updateMany(
+      {
+        $or: [
+          { image: { $regex: 'unsplash\\.com', $options: 'i' } },
+          { image: { $regex: 'pexels\\.com', $options: 'i' } },
+          { image: { $regex: 'placeholder', $options: 'i' } },
+        ],
+      },
+      { $set: { image: '' } }
+    );
   } catch (err) {
     console.error('Category migration sync error:', err);
   }
