@@ -22,51 +22,62 @@ import { INITIAL_CATEGORIES, INITIAL_PRODUCTS } from '@/lib/seedData';
 
 export default function HomePage() {
   const [categories, setCategories] = useState<Category[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [categoriesError, setCategoriesError] = useState<string | null>(null);
+
   const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [productsLoading, setProductsLoading] = useState(true);
+  const [productsError, setProductsError] = useState<string | null>(null);
 
-  const fetchData = async () => {
-    setLoading(true);
-    setFetchError(null);
+  const fetchCategories = async () => {
+    setCategoriesLoading(true);
+    setCategoriesError(null);
     try {
-      const [prodRes, catRes] = await Promise.all([
-        fetch('/api/products', { cache: 'no-store' }).catch((err) => {
-          console.warn('Products fetch exception:', err);
-          return null;
-        }),
-        fetch('/api/categories', { cache: 'no-store' }).catch((err) => {
-          console.warn('Categories fetch exception:', err);
-          return null;
-        }),
-      ]);
-
-      if (!prodRes || !prodRes.ok) {
-        throw new Error('Unable to load products. Please check connection.');
-      }
+      const catRes = await fetch('/api/categories', { cache: 'no-store' }).catch((err) => {
+        console.warn('Categories fetch exception:', err);
+        return null;
+      });
       if (!catRes || !catRes.ok) {
         throw new Error('Unable to load categories. Please check connection.');
       }
-
-      const prodData = await prodRes.json();
       const catData = await catRes.json();
-
-      if (prodData.success && Array.isArray(prodData.products)) {
-        setProducts(prodData.products);
-      }
       if (catData.success && Array.isArray(catData.categories)) {
         setCategories(catData.categories);
       }
     } catch (err: any) {
-      console.error('HomePage fetch caught error:', err);
-      setFetchError(err.message || 'Unable to load catalog data.');
+      console.error('Categories fetch caught error:', err);
+      setCategoriesError(err.message || 'Unable to load categories.');
     } finally {
-      setLoading(false);
+      setCategoriesLoading(false);
+    }
+  };
+
+  const fetchProducts = async () => {
+    setProductsLoading(true);
+    setProductsError(null);
+    try {
+      const prodRes = await fetch('/api/products', { cache: 'no-store' }).catch((err) => {
+        console.warn('Products fetch exception:', err);
+        return null;
+      });
+      if (!prodRes || !prodRes.ok) {
+        throw new Error('Unable to load products. Please check connection.');
+      }
+      const prodData = await prodRes.json();
+      if (prodData.success && Array.isArray(prodData.products)) {
+        setProducts(prodData.products);
+      }
+    } catch (err: any) {
+      console.error('Products fetch caught error:', err);
+      setProductsError(err.message || 'Unable to load products.');
+    } finally {
+      setProductsLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchData();
+    fetchCategories();
+    fetchProducts();
   }, []);
 
   const trendingProducts = products.filter((p) => p.isFeatured).slice(0, 4);
@@ -151,18 +162,21 @@ export default function HomePage() {
       </section>
 
       {/* API ERROR BANNER STATE */}
-      {fetchError && (
+      {(categoriesError || productsError) && (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-center space-y-3">
             <div className="flex items-center justify-center gap-2 text-red-600 font-bold text-base">
               <AlertCircle className="w-5 h-5" />
-              <span>{fetchError}</span>
+              <span>{categoriesError || productsError}</span>
             </div>
             <p className="text-xs text-red-500">
-              Unable to reach product server. Please verify your connection or try again.
+              Unable to reach catalog server. Please verify your connection or try again.
             </p>
             <button
-              onClick={fetchData}
+              onClick={() => {
+                fetchCategories();
+                fetchProducts();
+              }}
               className="inline-flex items-center gap-2 bg-[#111111] text-white text-xs font-bold px-6 py-2.5 rounded-full hover:bg-zinc-800 transition-colors uppercase tracking-wider"
             >
               <RotateCcw className="w-3.5 h-3.5" />
@@ -227,7 +241,7 @@ export default function HomePage() {
           </Link>
         </div>
 
-        {loading ? (
+        {categoriesLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {Array.from({ length: 9 }).map((_, i) => (
               <div
@@ -276,7 +290,7 @@ export default function HomePage() {
           </Link>
         </div>
 
-        {loading ? <GridSkeleton count={4} /> : <ProductGrid products={trendingProducts} />}
+        {productsLoading ? <GridSkeleton count={4} /> : <ProductGrid products={trendingProducts} />}
       </section>
 
       {/* SECTION 5 - NEW ARRIVALS */}
@@ -299,7 +313,7 @@ export default function HomePage() {
           </Link>
         </div>
 
-        {loading ? <GridSkeleton count={4} /> : <ProductGrid products={newArrivals} />}
+        {productsLoading ? <GridSkeleton count={4} /> : <ProductGrid products={newArrivals} />}
       </section>
 
       {/* SECTION 7 - BEST SELLERS */}
@@ -322,7 +336,7 @@ export default function HomePage() {
           </Link>
         </div>
 
-        {loading ? <GridSkeleton count={8} /> : <ProductGrid products={bestSellers} />}
+        {productsLoading ? <GridSkeleton count={8} /> : <ProductGrid products={bestSellers} />}
       </section>
 
       {/* SECTION 8 - WHY VINTAGE VAULT (WHITE STANDARD) */}

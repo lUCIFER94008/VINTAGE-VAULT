@@ -33,18 +33,9 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   const inWishlist = isInWishlist(safeId);
 
-  const defaultPlaceholder =
-    'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80';
-
-  const primaryImage =
-    !imageError && product?.images && product.images.length > 0
-      ? product.images[0]
-      : defaultPlaceholder;
-
-  const hoverImage =
-    !imageError && product?.images && product.images.length > 1
-      ? product.images[1]
-      : primaryImage;
+  const hasValidImage = !imageError && Boolean(product?.images && product.images.length > 0 && product.images[0]);
+  const primaryImage = hasValidImage ? product.images[0] : '';
+  const hoverImage = hasValidImage && product.images.length > 1 ? product.images[1] : primaryImage;
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -75,17 +66,33 @@ export default function ProductCard({ product }: ProductCardProps) {
     >
       {/* Top Image Container */}
       <div className="relative aspect-[4/5] w-full overflow-hidden bg-[#F8F8F8]">
-        <Link href={`/product/${product?.slug || safeId}`}>
-          <Image
-            src={isHovered ? hoverImage : primaryImage}
-            alt={safeName}
-            fill
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105"
-            onError={() => setImageError(true)}
-            unoptimized
-          />
-        </Link>
+        {hasValidImage ? (
+          <Link href={`/product/${product?.slug || safeId}`}>
+            <Image
+              src={isHovered ? hoverImage : primaryImage}
+              alt={safeName}
+              fill
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              className="object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105"
+              onError={() => {
+                console.warn(`[ProductCard] Image load failed for product "${safeName}":`, primaryImage);
+                setImageError(true);
+              }}
+              unoptimized
+            />
+          </Link>
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-b from-[#FAFAFA] to-[#F0F0F0] flex items-center justify-center p-6 text-center">
+            <div className="space-y-2">
+              <div className="w-12 h-12 rounded-2xl bg-white border border-[#EAEAEA] text-[#111111] font-black text-sm flex items-center justify-center mx-auto shadow-sm">
+                {safeName.substring(0, 2).toUpperCase()}
+              </div>
+              <span className="text-[9px] font-bold tracking-widest text-[#888888] uppercase block">
+                VINTAGE VAULT
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* Top Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">

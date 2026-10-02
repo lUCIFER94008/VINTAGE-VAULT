@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowUpRight } from 'lucide-react';
@@ -16,8 +16,9 @@ interface CategoryCardProps {
 }
 
 export default function CategoryCard({ name, slug, image, priority = false }: CategoryCardProps) {
+  const [imgError, setImgError] = useState(false);
   const optimizedImage = getOptimizedCategoryImageUrl(image, 800);
-  const hasValidImage = Boolean(optimizedImage);
+  const hasValidImage = Boolean(optimizedImage) && !imgError;
 
   return (
     <Link
@@ -34,6 +35,10 @@ export default function CategoryCard({ name, slug, image, priority = false }: Ca
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             priority={priority}
             loading={priority ? 'eager' : 'lazy'}
+            onError={() => {
+              console.warn(`[CategoryCard] Image load failed for category "${name}":`, optimizedImage);
+              setImgError(true);
+            }}
             className="object-cover object-center transition-transform duration-700 group-hover:scale-105 opacity-90 group-hover:opacity-100"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-white via-white/40 to-transparent" />

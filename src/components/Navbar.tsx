@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Search, ShoppingBag, Heart, User, Menu, X, ShieldAlert } from 'lucide-react';
@@ -12,10 +12,15 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const { itemCount } = useCart();
   const { wishlistCount } = useWishlist();
   const { user } = useAuth();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const mainNavLinks = [
     { name: 'Home', href: '/' },
@@ -152,7 +157,7 @@ export default function Navbar() {
                 aria-label="Wishlist"
               >
                 <Heart className="w-5 h-5" />
-                {wishlistCount > 0 && (
+                {mounted && wishlistCount > 0 && (
                   <span className="absolute top-1 right-1 bg-[#111111] text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
                     {wishlistCount}
                   </span>
@@ -161,12 +166,12 @@ export default function Navbar() {
 
               {/* Account Link */}
               <Link
-                href={user ? (user.role === 'admin' ? '/admin/dashboard' : '/account') : '/login'}
+                href={mounted && user ? (user.role === 'admin' ? '/admin/dashboard' : '/account') : '/login'}
                 className="p-2 text-[#111111] hover:text-zinc-600 transition-colors flex items-center gap-1"
                 aria-label="User Account"
               >
                 <User className="w-5 h-5" />
-                {user && (
+                {mounted && user && (
                   <span className="hidden md:inline text-xs font-semibold text-[#111111] max-w-[80px] truncate">
                     {user.name.split(' ')[0]}
                   </span>
@@ -180,7 +185,7 @@ export default function Navbar() {
                 aria-label="Shopping Cart"
               >
                 <ShoppingBag className="w-4 h-4 text-[#111111]" />
-                <span className="text-xs font-bold text-[#111111]">{itemCount}</span>
+                <span className="text-xs font-bold text-[#111111]">{mounted ? itemCount : 0}</span>
               </Link>
             </div>
           </div>
