@@ -94,6 +94,15 @@ export async function DELETE(
 
     await Category.findByIdAndUpdate(id, { isActive: false });
 
+    try {
+      revalidatePath('/', 'layout');
+      revalidatePath('/products');
+      revalidatePath(`/category/${categoryDoc.slug}`);
+      revalidatePath('/admin/categories');
+    } catch (e) {
+      // Ignore cache revalidation errors if any
+    }
+
     return NextResponse.json({
       success: true,
       message: 'Category deactivated successfully.',

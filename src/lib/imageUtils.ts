@@ -1,6 +1,17 @@
-export function getOptimizedCategoryImageUrl(url?: string, width = 800): string {
-  if (!url || typeof url !== 'string' || !url.trim()) return '';
-  const trimmed = url.trim();
+export function getOptimizedCategoryImageUrl(input?: any, width = 800): string {
+  if (!input) return '';
+
+  let rawUrl = '';
+  if (typeof input === 'string') {
+    rawUrl = input;
+  } else if (typeof input === 'object') {
+    rawUrl = input.image || input.imageUrl || input.image_url || input.url || '';
+  }
+
+  if (typeof rawUrl !== 'string' || !rawUrl.trim()) return '';
+  const trimmed = rawUrl.trim();
+
+  if (trimmed === 'null' || trimmed === 'undefined') return '';
 
   // Strip fake/stock/AI placeholders
   if (

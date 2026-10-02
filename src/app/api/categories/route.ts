@@ -105,16 +105,30 @@ export async function POST(req: NextRequest) {
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)+/g, '');
 
-    const category = await Category.create({
-      name,
-      slug,
-      description: description || '',
-      image: image || '',
-      isActive: true,
+    const existing = await Category.findOne({
+      $or: [{ slug }, { name: { $regex: `^${name.trim()}$`, $options: 'i' } }],
     });
 
+    let category;
+    if (existing) {
+      existing.name = name.trim();
+      existing.slug = slug;
+      if (description !== undefined) existing.description = description;
+      if (image !== undefined) existing.image = image;
+      existing.isActive = true;
+      category = await existing.save();
+    } else {
+      category = await Category.create({
+        name: name.trim(),
+        slug,
+        description: description || '',
+        image: image || '',
+        isActive: true,
+      });
+    }
+
     try {
-      revalidatePath('/');
+      revalidatePath('/', 'layout');
       revalidatePath('/products');
       revalidatePath('/admin/categories');
     } catch (e) {
@@ -123,7 +137,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Category created successfully!',
+      message: existing ? 'Category updated successfully!' : 'Category created successfully!',
       category,
     });
   } catch (error: any) {
