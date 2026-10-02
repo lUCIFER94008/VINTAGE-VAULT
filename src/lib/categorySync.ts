@@ -61,6 +61,9 @@ export const ALL_CATEGORIES_CONFIG = [
 let syncDone = false;
 
 export async function ensureCategoryMigration() {
+  if (syncDone) return;
+  syncDone = true;
+
   try {
     // 1. Rename existing categories in Category collection if old slugs exist
     await Category.updateOne(

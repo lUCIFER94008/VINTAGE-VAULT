@@ -249,6 +249,7 @@ export default function HomePage() {
                 name={cat.name}
                 slug={cat.slug}
                 image={cat.image || ''}
+                priority={idx < 3}
               />
             ))}
           </div>

@@ -4,6 +4,8 @@ import { Category } from '@/lib/models/Category';
 import { Product } from '@/lib/models/Product';
 import { requireAdmin } from '@/lib/auth';
 
+import { revalidatePath } from 'next/cache';
+
 export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -31,6 +33,15 @@ export async function PUT(
         { success: false, message: 'Category not found.' },
         { status: 404 }
       );
+    }
+
+    try {
+      revalidatePath('/');
+      revalidatePath('/products');
+      revalidatePath(`/category/${category.slug}`);
+      revalidatePath('/admin/categories');
+    } catch (e) {
+      // Ignore cache revalidation errors if any
     }
 
     return NextResponse.json({

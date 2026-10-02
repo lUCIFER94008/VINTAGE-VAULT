@@ -5,6 +5,8 @@ import { Product } from '@/lib/models/Product';
 import { requireAdmin } from '@/lib/auth';
 import { ensureCategoryMigration } from '@/lib/categorySync';
 
+import { revalidatePath } from 'next/cache';
+
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
@@ -20,27 +22,41 @@ const CATEGORY_ORDER = [
   'track-pant',
 ];
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     await connectToDatabase();
     await ensureCategoryMigration();
-    const categories = await Category.find({ isActive: true });
 
-    // Count products per category & convert _id to string
-    const categoriesWithCounts = await Promise.all(
-      categories.map(async (cat: any) => {
-        const obj = typeof cat.toObject === 'function' ? cat.toObject() : cat;
-        const count = await Product.countDocuments({ category: cat.slug, isActive: true });
-        return {
-          ...obj,
-          _id: obj._id ? obj._id.toString() : String(cat._id),
-          itemCount: count,
-        };
-      })
-    );
+    const { searchParams } = new URL(req.url);
+    const includeCounts = searchParams.get('includeCounts') === 'true';
+
+    // Lean query retrieving only necessary fields
+    const categories = await Category.find({ isActive: true })
+      .select('_id name slug image description isActive')
+      .lean();
+
+    let categoriesResult: any[] = [];
+
+    if (includeCounts) {
+      categoriesResult = await Promise.all(
+        categories.map(async (cat: any) => {
+          const count = await Product.countDocuments({ category: cat.slug, isActive: true });
+          return {
+            ...cat,
+            _id: cat._id ? cat._id.toString() : String(cat._id),
+            itemCount: count,
+          };
+        })
+      );
+    } else {
+      categoriesResult = categories.map((cat: any) => ({
+        ...cat,
+        _id: cat._id ? cat._id.toString() : String(cat._id),
+      }));
+    }
 
     // Sort according to target category order
-    categoriesWithCounts.sort((a, b) => {
+    categoriesResult.sort((a, b) => {
       const idxA = CATEGORY_ORDER.indexOf(a.slug);
       const idxB = CATEGORY_ORDER.indexOf(b.slug);
       const posA = idxA === -1 ? 99 : idxA;
@@ -51,7 +67,7 @@ export async function GET() {
     return NextResponse.json(
       {
         success: true,
-        categories: categoriesWithCounts,
+        categories: categoriesResult,
       },
       {
         headers: {
@@ -96,6 +112,14 @@ export async function POST(req: NextRequest) {
       image: image || '',
       isActive: true,
     });
+
+    try {
+      revalidatePath('/');
+      revalidatePath('/products');
+      revalidatePath('/admin/categories');
+    } catch (e) {
+      // Ignore cache revalidation errors if any
+    }
 
     return NextResponse.json({
       success: true,

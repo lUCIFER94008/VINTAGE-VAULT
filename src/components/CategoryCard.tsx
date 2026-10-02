@@ -5,22 +5,19 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowUpRight } from 'lucide-react';
 
+import { getOptimizedCategoryImageUrl } from '@/lib/imageUtils';
+
 interface CategoryCardProps {
   name: string;
   slug: string;
   image: string;
   description?: string;
+  priority?: boolean;
 }
 
-export default function CategoryCard({ name, slug, image }: CategoryCardProps) {
-  const hasValidImage = Boolean(
-    image &&
-      typeof image === 'string' &&
-      image.trim() !== '' &&
-      !image.includes('unsplash.com') &&
-      !image.includes('pexels.com') &&
-      !image.includes('placeholder')
-  );
+export default function CategoryCard({ name, slug, image, priority = false }: CategoryCardProps) {
+  const optimizedImage = getOptimizedCategoryImageUrl(image, 800);
+  const hasValidImage = Boolean(optimizedImage);
 
   return (
     <Link
@@ -31,11 +28,13 @@ export default function CategoryCard({ name, slug, image }: CategoryCardProps) {
       {hasValidImage ? (
         <>
           <Image
-            src={image}
+            src={optimizedImage}
             alt={name}
             fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            priority={priority}
+            loading={priority ? 'eager' : 'lazy'}
             className="object-cover object-center transition-transform duration-700 group-hover:scale-105 opacity-90 group-hover:opacity-100"
-            unoptimized
           />
           <div className="absolute inset-0 bg-gradient-to-t from-white via-white/40 to-transparent" />
         </>
